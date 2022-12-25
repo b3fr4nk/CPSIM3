@@ -50,13 +50,13 @@ class Sim():
             current_day += 1
 
 
-#testing stuff
-stepD = Step([], 70, 1, 2, 2)
-stepC = Step([stepD], 110, 4, 10, 1)
-stepB = Step([], 100, 4, 10, 1)
-stepA = Step([stepB, stepC], 200, 10, 5, 2)
+# #testing stuff
+# stepD = Step([], 70, 1, 2, 2)
+# stepC = Step([stepD], 110, 4, 10, 1)
+# stepB = Step([], 100, 4, 10, 1)
+# stepA = Step([stepB, stepC], 200, 10, 5, 2)
 
-sim = Sim(stepA, 26, 0)
+# sim = Sim(stepA, 26, 0)
 
-sim.run()
+# sim.run()
 
