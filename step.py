@@ -1,7 +1,8 @@
 
 class Step():
     
-    def __init__(self, next_steps, default_cost, default_time, step_amount):
+    def __init__(self, step_num, next_steps, default_cost, default_time, step_amount):
+        self.__step_num = step_num
         self._days_saved = 0
         """
         Args:   next_steps(list)
@@ -23,21 +24,34 @@ class Step():
         self._days_saved += 1
 
     def reduce_cost(self):
-        self.__current_cost -= self.__step_amount
-        self._days_saved += 1
+        self.__current_cost -= self.__step_amount[self._days_saved]
+        self._days_saved -= 1
     def get_cost(self):
         return self.__current_cost
 
     def get_time(self):
         return self.__default_time - self._days_saved
 
+    def get_step_num(self):
+        return self.__step_num
+
     def get_next(self):
         return self._next_steps
-# testing stuff
-step1 = Step([], 300, 4, [100, 200, 400])
 
-print(f"start cost: {step1.get_cost()}")
-print(f"start time: {step1.get_time()} day(s)")
-step1.add_cost()
-print(f"after change cost: {step1.get_cost()}")
-print(f"after change time: {step1.get_time()} day(s)")
+    def get_json(self):
+        
+        return {'step':self.get_step_num(), 'next':self.__get_next_json(), 'cost':self.get_cost(), 'time':self.get_time()}
+
+    def __get_next_json(self):
+        results = []
+        for next_step in self._next_steps:
+            results.append({'step':next_step.get_step_num(),'cost':next_step.get_cost(), 'time':next_step.get_time()})
+        return results
+# # testing stuff
+# step1 = Step([], 300, 4, [100, 200, 400])
+
+# print(f"start cost: {step1.get_cost()}")
+# print(f"start time: {step1.get_time()} day(s)")
+# step1.add_cost()
+# print(f"after change cost: {step1.get_cost()}")
+# print(f"after change time: {step1.get_time()} day(s)")
