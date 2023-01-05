@@ -1,3 +1,4 @@
+import json
 from sim import Sim
 from step import Step
 from flask import Flask, request, redirect, render_template, url_for
@@ -52,16 +53,14 @@ step1 = Step(1, [step2, step3, step4, step5], 10000, 4, [0])
 
 sim = Sim(step1, 107, 0)
 #Routes
-@app.route('/')
+@app.route('/', methods=["POST"])
 def render():
     #main app
     start_step = sim.get_start()
 
     steps = sim.get_json(start_step, start_step.get_step_num())
 
-    print(steps)
-
-    return render_template('index.html', **steps)
+    return json.dump(steps, indent=4)
 
 if __name__ == '__main__':
     app.run(debug=True)
