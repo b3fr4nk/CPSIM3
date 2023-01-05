@@ -1,0 +1,43 @@
+body{
+	margin: 0;
+	padding: 0;
+}
+#sim{
+	display: grid;
+	grid-template-columns: repeat(10, 150px [col-start]);
+	grid-template-rows: repeat(8, 150px [col-start]);
+}
+.step{
+	display: flex;
+	flex-direction: column;
+	border-style: solid;
+	border-width: 3px;
+	border-radius: 10px;
+	border-color: black;
+	width: 100px;
+	align-items: center;
+}
+
+.cost{
+	margin: 0.1em;
+}
+
+.edit{
+	margin: 0.2em;
+	padding: 2px;
+}
+
+.time{
+	margin: 0.1em;
+}
+h3{
+	margin: 0.5em;
+}
+
+.link{
+	background-color: black;
+}
+
+button{
+	margin: 0.5em;
+}
