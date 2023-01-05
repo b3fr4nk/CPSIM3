@@ -1,7 +1,6 @@
-import json
 from sim import Sim
 from step import Step
-from flask import Flask, request, redirect, render_template, url_for
+from flask import Flask, request, redirect, render_template, url_for, jsonify
 
 app = Flask(__name__)
 
@@ -10,7 +9,7 @@ end = Step(44, [], 0, 0, [0])
 step43 = Step(43, [end], 71360, 22, [540, 600, 650, 730, 820])
 step42 = Step(42, [end], 157500, 20, [920, 1020, 1140, 1290])
 step41 = Step(41, [end], 82720, 22, [1080, 1200, 1310, 1460, 1640, 1840, 2080])
-step40 = Step(40, [end], 118420, 19, [1020, 1140, 1290, 1460, 1670, 1920, 2240])
+step40 = Step(40, [step41], 118420, 19, [1020, 1140, 1290, 1460, 1670, 1920, 2240])
 step39 = Step(39, [end], 36500, 20, [340, 380, 420, 480, 540, 620])
 step38 = Step(38, [step43], 81900, 21, [600, 650, 730, 820, 920, 1040, 1190, 1380, 1600])
 step37 = Step(37, [step43], 73880, 18, [820, 920])
@@ -25,7 +24,7 @@ step29 = Step(29, [step36, step37], 41660, 18, [690, 770, 880, 1000, 1150, 1350,
 step28 = Step(28, [step36, step37], 112220, 18, [720, 810, 910, 1050, 1210, 1410, 1670, 2000, 2440])
 step27 = Step(27, [step35, step34, step33], 103040, 23, [590, 650, 720, 780, 880, 980, 1110])
 step26 = Step(26, [step31], 71810, 22, [330, 360, 390, 440, 490, 550, 630, 710])
-step25 = Step(25, [step32], 61420, 21, [580, 630, 700, 780])
+step25 = Step(25, [step32, step40], 61420, 21, [580, 630, 700, 780])
 step24 = Step(24, [step31], 63330, 18, [780, 890, 1000, 1140, 1320, 1540, 1810, 2190, 2660, 3340])
 step23 = Step(23, [step38], 69040, 21, [460, 500, 550, 620, 700, 790])
 step22 = Step(22, [step26, step27], 7000, 5, [1000, 1660])
@@ -53,14 +52,26 @@ step1 = Step(1, [step2, step3, step4, step5], 10000, 4, [0])
 
 sim = Sim(step1, 107, 0)
 #Routes
-@app.route('/', methods=["POST"])
-def render():
+@app.route("/")
+def render_sim():
+    return render_template("index.html")
+
+@app.route('/sim', methods=["POST", "GET"])
+def get_sim_data():
     #main app
-    start_step = sim.get_start()
+    if request.method == "GET":
+        start_step = sim.get_start()
 
-    steps = sim.get_json(start_step, start_step.get_step_num())
+        steps = sim.get_json(start_step, start_step.get_step_num())
+        steps["num_steps"] = len(steps.keys())
 
-    return json.dump(steps, indent=4)
+        # context = {
+        #     "steps":json,
+        #     "num_steps":len(steps.keys())
+        # }
+
+        return jsonify(steps)
+       
 
 if __name__ == '__main__':
     app.run(debug=True)
