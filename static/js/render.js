@@ -35,7 +35,7 @@ function render(sim){
 
         const step = document.createElement("div");
         step.setAttribute("class", "step");
-        step.setAttribute("id", i)
+        step.setAttribute("id", `s${i}`)
 
         step.appendChild(title);
         step.appendChild(cost);
@@ -47,7 +47,7 @@ function render(sim){
         steps.push(step);
     }
     for(let i = 1; i < sim['num_steps']; i++){
-        from = document.getElementById(`${sim[`${i}`]["step"]}`);
+        from = document.getElementById(`s${sim[`${i}`]["step"]}`);
         next = sim[`${i}`]["next"];
         for(let j=0; j < next.length; j++){
             line = document.createElement("div")
@@ -55,7 +55,7 @@ function render(sim){
 
             tree.appendChild(line);
 
-            to = document.getElementById(`${next[j]["step"]}`)
+            to = document.getElementById(`s${next[j]["step"]}`)
 
             adjustLine(from, to, line)
             
