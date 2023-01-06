@@ -3,9 +3,12 @@ body{
 	padding: 0;
 }
 #sim{
+	position: absolute;
 	display: grid;
-	grid-template-columns: repeat(10, 140px [col-start]);
-	grid-template-rows: repeat(8, 100px [col-start]);
+	margin: 0;
+	padding: 0;
+	grid-template-columns: repeat(10, 10vw [col-start]);
+	grid-template-rows: repeat(8, 12vh [col-start]);
 }
 .step{
 	display: flex;
@@ -14,12 +17,15 @@ body{
 	border-width: 3px;
 	border-radius: 10px;
 	border-color: black;
-	width: 100px;
+	width: 90px;
 	align-items: center;
+	margin: 0.5em;
+	flex-wrap: wrap;
 }
 
 .cost{
 	margin: 0em;
+	font-size: 0.7rem;
 }
 
 .edit{
@@ -30,6 +36,7 @@ body{
 
 .time{
 	margin: 0em;
+	font-size: 0.7rem;
 }
 h3{
 	margin: 0.3em;
@@ -43,6 +50,7 @@ h3{
 
 button{
 	margin: 0.1em;
+	font-size: 0.7rem;
 }
 
 /* links/lines */
