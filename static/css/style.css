@@ -4,8 +4,8 @@ body{
 }
 #sim{
 	display: grid;
-	grid-template-columns: repeat(10, 150px [col-start]);
-	grid-template-rows: repeat(8, 150px [col-start]);
+	grid-template-columns: repeat(10, 140px [col-start]);
+	grid-template-rows: repeat(8, 100px [col-start]);
 }
 .step{
 	display: flex;
@@ -19,25 +19,28 @@ body{
 }
 
 .cost{
-	margin: 0.1em;
+	margin: 0em;
 }
 
 .edit{
-	margin: 0.2em;
-	padding: 2px;
+	display: inline-flex;
+	margin: 0.1em;
+	padding: 1px;
 }
 
 .time{
-	margin: 0.1em;
+	margin: 0em;
 }
 h3{
-	margin: 0.5em;
+	margin: 0.3em;
 }
 
-.link{
-	background-color: black;
-}
+.line{
+  position:absolute;
+  width:1px;
+  background-color:black;
+}  
 
 button{
-	margin: 0.5em;
+	margin: 0.1em;
 }
