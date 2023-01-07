@@ -16,9 +16,14 @@ function render(sim){
 
         const addButton = document.createElement("button");
         addButton.innerHTML = "+";
+        addButton.setAttribute("class", sim[`${i}`]["step"])
+        addButton.setAttribute("onClick", `add(this.getAttribute("class"))`)
 
         const subtractButton = document.createElement("button");
         subtractButton.innerHTML = "-";
+        subtractButton.setAttribute("class", sim[`${i}`]["step"])
+        subtractButton.setAttribute("onClick", `reduce(this.getAttribute("class"))`)
+
 
         const editButtons = document.createElement("div");
         editButtons.appendChild(addButton)
@@ -28,10 +33,12 @@ function render(sim){
         const time = document.createElement("p");
         time.innerHTML = `${sim[`${i}`]["time"]} Days`;
         time.setAttribute("class", "time")
+        time.setAttribute("id", `${i}time`)
 
         const cost = document.createElement("p");
         cost.innerHTML = `$${sim[`${i}`]["cost"]}`;
         cost.setAttribute("class", "cost")
+        cost.setAttribute("id", `${i}cost`)
 
         const step = document.createElement("div");
         step.setAttribute("class", "step");
@@ -107,4 +114,34 @@ function adjustLine(from, to, line) {
   line.style.height = H + "px";
 }
 
+function add(step){
+    updateSim(step, true)
+}
 
+function reduce(step) {
+    
+    updateSim(step, false);
+}
+
+function updateSim(step_num, isAdd){
+    fetch("/update", {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({"step_num":step_num, "isAdd":isAdd}),
+    })
+      .then((response) => response.json())
+      .then((response) => updateStep(step_num, response));
+}
+
+function updateStep(step_num, sim){
+    cost = document.getElementById(`${step_num}cost`)
+    time = document.getElementById(`${step_num}time`)
+
+    console.log(sim[step_num])
+
+    cost = sim[step_num]["cost"]
+    time = sim[`${step_num}`]["time"]
+}
