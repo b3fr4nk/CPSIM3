@@ -20,12 +20,20 @@ class Step():
         self.__current_cost = default_cost
 
     def add_cost(self):
-        self.__current_cost += self.__step_amount[self._days_saved]
-        self._days_saved += 1
+        if len(self.__step_amount) > self._days_saved + 1 and self._days_saved >= 0:
+            self._days_saved += 1
+            self.__current_cost += self.__step_amount[self._days_saved]
+            
 
     def reduce_cost(self):
-        self.__current_cost -= self.__step_amount[self._days_saved]
-        self._days_saved -= 1
+        if len(self.__step_amount) > self._days_saved and self._days_saved - 1 > 0:
+            self._days_saved -= 1
+            self.__current_cost -= self.__step_amount[self._days_saved]
+        elif self._days_saved == 1:
+            self._days_saved = 0
+            self.__current_cost = self.__default_cost
+            
+
     def get_cost(self):
         return self.__current_cost
 

@@ -10,18 +10,21 @@ class Sim():
 
         self.time_remaining = deadline
 
+        self._steps = self.get_steps_dict(self.__start_step)
+
         output = self._calc(self.__start_step, 0)
         self._current_cost = output['cost']
         self._current_time = output['time']
+        self.__current_day = 0
 
     def get_start(self):
         return self.__start_step
 
-    def _get_steps_dict(self, step):
-        steps = {f"{step.get_step_num}":step}
+    def get_steps_dict(self, step):
+        steps = {f"{step.get_step_num()}":step}
 
         for next_step in step.get_next():
-            output = self._get_steps_dict(next_step)
+            output = self.get_steps_dict(next_step)
             steps.update(output)
 
         return steps
@@ -29,13 +32,19 @@ class Sim():
     def get_json(self, step, step_num):
         results = {}
 
-        steps = self._get_steps_dict(step)
+        steps = self._steps
 
         for step in steps.keys():
             step_json = steps[step].get_json()
             results[f'{step_json["step"]}'] = step_json
 
         return results
+
+    def update_step(self, step_num, isAdd):
+        if isAdd:
+            self._steps[step_num].add_cost()
+        else:
+            self._steps[step_num].reduce_cost()
 
     def _calc(self, step, step_num):
         time = 0
@@ -59,10 +68,9 @@ class Sim():
         return {"time":time, "cost":cost, "step":step_num}
 
     
-    def run(self):
-        current_day = 0
+    def next_day(self):
 
-        while current_day < self._current_time:
+        if self.__current_day < self._current_time:
             output = self._calc(self.__start_step, 0)
             self._current_cost = output['cost']
             self._current_time = output['time']
@@ -72,15 +80,14 @@ class Sim():
             print(f"cost: {self._current_cost}")
             print(f"time left: {self.time_remaining}")
             
-            current_day += 1
+            self.__current_day += 1
 
 
 #testing stuff
-# stepD = Step([], 70, 1, [25, 30, 50])
-# stepC = Step([stepD], 110, 5, [30, 45, 50])
-# stepB = Step([], 100, 4, [30, 50, 60])
-# stepA = Step([stepB, stepC], 200, 1, [70, 90, 110, 150])
+# step1 = Step(1, [], 100, 1, [100, 200])
 
-# sim = Sim(stepA, 26, 0)
+# sim = Sim(step1, 26, 0)
 
-# sim.run()
+# print(sim.get_json(step1, f"{step1.get_step_num()}"))
+# sim.update_step(f"{step1.get_step_num()}", False)
+# print(sim.get_json(step1, f"{step1.get_step_num()}"))
