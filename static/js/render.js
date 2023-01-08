@@ -4,13 +4,17 @@ const tree = document.getElementById("sim");
 
 sim = {}
 
+const days = document.getElementById("days");
+
+
 fetch("/sim")
     .then((response) => response.json())
     .then((data) => render(data));
     
 function render(sim){
-
+    // add steps
     for (let i = 1; i < sim['num_steps']+1; i++) {
+        // set up each html element
         const title = document.createElement("h3");
         title.innerHTML = sim[`${i}`]["step"];
 
@@ -44,6 +48,7 @@ function render(sim){
         step.setAttribute("class", "step");
         step.setAttribute("id", `s${i}`)
 
+        // combine the html elements into one step
         step.appendChild(title);
         step.appendChild(cost);
         step.appendChild(time);
@@ -53,18 +58,45 @@ function render(sim){
 
         steps.push(step);
     }
+
+    days.innerHTML = `Days:${sim["days"]}`;
+    
+    // add lines
     for(let i = 1; i < sim['num_steps']; i++){
         from = document.getElementById(`s${sim[`${i}`]["step"]}`);
         next = sim[`${i}`]["next"];
+        isRed = false
+        
+        for(let j = sim["path"].length-1; j >= 0; j--){
+            if (Number(sim[`${i}`]["step"]) == Number(sim["path"][j])) {
+              isRed = true;
+            }
+        }
+        
+
         for(let j=0; j < next.length; j++){
             line = document.createElement("div")
-            line.setAttribute("class", "line")
+            line.setAttribute("class", "line")           
 
             tree.appendChild(line);
 
             to = document.getElementById(`s${next[j]["step"]}`)
 
             adjustLine(from, to, line)
+
+            linePath = next[j]["step"]
+
+            if (isRed) {
+                for(let k = sim["path"].length -1; k >= 0; k--){
+                    if (Number(linePath) == Number(sim["path"][k])) {
+                      line.style.backgroundColor = "red";
+                    } 
+                }
+                if(Number(linePath) == 44){
+                    line.style.backgroundColor = "red";
+                }
+            }
+
             
         }
         
@@ -73,11 +105,12 @@ function render(sim){
 }
 
 function adjustLine(from, to, line) {
+    // get start and end point of each line
   var fT = from.offsetTop + from.offsetHeight / 2;
   var tT = to.offsetTop + to.offsetHeight / 2;
-  var fL = from.offsetLeft + from.offsetWidth / 2;
-  var tL = to.offsetLeft + to.offsetWidth / 2;
-
+  var fL = from.offsetLeft + from.offsetWidth;
+  var tL = to.offsetLeft;
+    // get angle each line needs 
   var CA = Math.abs(tT - fT);
   var CO = Math.abs(tL - fL);
   var H = Math.sqrt(CA * CA + CO * CO);
@@ -104,6 +137,7 @@ function adjustLine(from, to, line) {
   }
   top -= H / 2;
 
+//   adjust line with math done above
   line.style["-webkit-transform"] = "rotate(" + ANG + "deg)";
   line.style["-moz-transform"] = "rotate(" + ANG + "deg)";
   line.style["-ms-transform"] = "rotate(" + ANG + "deg)";
@@ -114,16 +148,18 @@ function adjustLine(from, to, line) {
   line.style.height = H + "px";
 }
 
+// for when add button is pressed
 function add(step){
     updateSim(step, true)
 }
-
+// for when reduce button is pressed
 function reduce(step) {
     
     updateSim(step, false);
 }
-
+// updates whole sim 
 function updateSim(step_num, isAdd){
+    // get data from server
     fetch("/update", {
       method: "POST",
       headers: {
@@ -135,13 +171,28 @@ function updateSim(step_num, isAdd){
       .then((response) => response.json())
       .then((response) => updateStep(step_num, response));
 }
-
+// change the values inside each step
 function updateStep(step_num, sim){
     cost = document.getElementById(`${step_num}cost`)
     time = document.getElementById(`${step_num}time`)
 
-    console.log(sim[step_num])
+    cost.innerHTML = `$${sim[`${step_num}`]["cost"]}`
+    time.innerHTML = `${sim[`${step_num}`]["time"]} Days`
 
-    cost = sim[step_num]["cost"]
-    time = sim[`${step_num}`]["time"]
+    const days = document.getElementById("days");
+    days.innerHTML = `Days:${sim["days"]}`;
+}
+
+function progress(){
+    // send progress command to server and get results from server
+    fetch("/progress", {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({"next":true}),
+    })
+      .then((response) => response.json())
+      .then((response) => console.log(response));
 }
