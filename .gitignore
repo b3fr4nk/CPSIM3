@@ -2,3 +2,4 @@ venv
 DOCS
 __pycache__
 sim.json
+.D*
