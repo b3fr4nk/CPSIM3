@@ -16,6 +16,7 @@ class Step():
         self.__default_cost = default_cost
         self.__default_time = default_time
         self.__step_amount = step_amount
+        self.__slack = self.__step_amount[-1] - self.__default_time
 
         self.__current_cost = default_cost
 
@@ -46,9 +47,14 @@ class Step():
     def get_next(self):
         return self._next_steps
 
-    def get_json(self):
+    def get_slack(self):
+        return self.__slack
         
-        return {'step':self.get_step_num(), 'next':self.__get_next_json(), 'cost':self.get_cost(), 'time':self.get_time()}
+    def set_slack(self, new_slack):
+        self.__slack = new_slack
+
+    def get_json(self):
+        return {'step':self.get_step_num(), 'next':self.__get_next_json(), 'cost':self.get_cost(), 'time':self.get_time(), 'slack':self.__slack}
 
     def __get_next_json(self):
         results = []
