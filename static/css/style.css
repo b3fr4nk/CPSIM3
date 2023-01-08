@@ -3,7 +3,7 @@ body{
 	padding: 0;
 }
 #sim{
-	position: absolute;
+	position: relative;
 	display: grid;
 	margin: 0;
 	padding: 0;
@@ -48,47 +48,60 @@ h3{
   background-color:black;
 }  
 
-button{
+.edit > button{
 	margin: 0.1em;
 	font-size: 0.7rem;
 }
 
 /* links/lines */
 #s1{
-	
 	grid-column: 1;
 	grid-row: 4;
+
+	border-color: black;
 }
 
 #s2{
 	grid-column: 2;
 	grid-row: 2;
+
+	border-color: aqua;
 }
 
 #s3{
 	grid-column: 2;
 	grid-row: 3;
 
+	border-color: blue;
+
 }
 
 #s4{
 	grid-column: 2;
 	grid-row: 5;
+
+	border-color: blueviolet;
 }
 
 #s5{
 	grid-column: 2;
 	grid-row: 7;
+
+	border-color: aquamarine;
 }
 
 #s6{
 	grid-column: 3;
 	grid-row: 1;
+
+	border-color: brown;
 }
 
 #s7{
 	grid-column: 3;
 	grid-row: 2;
+
+	border-color: burlywood;
 
 }
 
@@ -96,6 +109,8 @@ button{
 	
 	grid-column: 4;
 	grid-row: 2;
+
+	border-color: darkcyan;
 }
 
 #s9{
