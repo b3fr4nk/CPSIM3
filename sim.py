@@ -13,7 +13,7 @@ class Sim():
 
         self._steps = self.get_steps_dict(self.__start_step)
 
-        output = self._calc(1)
+        output = self.calc(1)
         self._current_cost = output['cost']
         self._current_time = output['time']
         self.__current_day = 0
@@ -30,7 +30,7 @@ class Sim():
 
         return steps
 
-    def get_json(self, step, step_num):
+    def get_json(self, step1, step_num):
         results = {}
 
         steps = self._steps
@@ -51,7 +51,7 @@ class Sim():
 
         self._steps = self.get_steps_dict(self.get_start())
 
-    def _calc(self, step_num):
+    def calc(self, step_num):
         time = 0
         cost = 0
 
@@ -59,6 +59,9 @@ class Sim():
         self._cPath = time_out[1] #index 1 is list of step numbers for critical path
         time = time_out[0]
         cost = self._calc_cost()
+
+        self._current_cost = cost
+        self._current_time = time
             
         return {"time":time, "cost":cost, "step":step_num}
 
@@ -67,6 +70,9 @@ class Sim():
 
     def get_time(self):
         return self._current_time
+
+    def get_cost(self):
+        return self._current_cost
 
     def _calc_cost(self):
         cost = 0
@@ -109,7 +115,7 @@ class Sim():
     def next_day(self):
 
         if self.__current_day < self._current_time:
-            output = self._calc(1)
+            output = self.calc(1)
             self._current_cost = output['cost']
             self._current_time = output['time']
             self._time_remaining = self._current_time - self.__current_day
