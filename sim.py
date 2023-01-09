@@ -2,6 +2,9 @@ import time
 from step import Step
 
 class Sim():
+    """
+    used to process each step
+    """
 
     def __init__(self, start_step, deadline, change_events):
         self.__start_step = start_step
@@ -89,6 +92,7 @@ class Sim():
         if len(self._steps[f"{step_num}"].get_next()) > 0:
             fast_time = curr_time + self._steps[f"{step_num}"].get_next()[0].get_time()
             for next_step in self._steps[f"{step_num}"].get_next():
+
                 output = self._calc_time(next_step.get_step_num(), time = curr_time)
                 temp_time = output[0]
                 
@@ -119,10 +123,6 @@ class Sim():
             self._current_cost = output['cost']
             self._current_time = output['time']
             self._time_remaining = self._current_time - self.__current_day
-
-            # print(f"day: {self.__current_day}")
-            # print(f"cost: {self._current_cost}")
-            # print(f"time left: {self.time_remaining}")
             
             self.__current_day += 1
 

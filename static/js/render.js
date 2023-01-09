@@ -37,11 +37,13 @@ function render(sim){
         subtractButton.setAttribute("class", `${sim[`${i}`]["step"]}`);
         subtractButton.setAttribute("onClick", `reduce(this.getAttribute("class"))`)
 
-
         const editButtons = document.createElement("div");
-        editButtons.appendChild(addButton)
-        editButtons.appendChild(subtractButton)
+        editButtons.appendChild(addButton);
+        editButtons.appendChild(subtractButton);
         editButtons.setAttribute("class", "edit");
+
+        
+        
 
         const time = document.createElement("p");
         time.innerHTML = `${sim[`${i}`]["time"]} Days`;
@@ -67,7 +69,12 @@ function render(sim){
 
         steps.push(step);
 
-        updateButton(i, sim)
+        updateButton(i, sim);
+
+        if (sim[`${i}`]["max_reductions"] == 0) {
+          editButtons.remove(addButton)
+          editButtons.remove(subtractButton)
+        }
     }
 
     days.innerHTML = `Days:${sim["days"]}`;
@@ -104,21 +111,23 @@ function render(sim){
 }
 
 function drawCriticalPath(sim){
+  //change all lines to black
   lines = document.getElementsByClassName("line") 
   for(let i = 0; i < lines.length; i++){
     lines[i].style.backgroundColor = "black";
   }
-  
+  //change critical path to red
   for(let j = 1; j < sim["path"].length; j++){
     lineID = `${sim["path"][j]}-${sim["path"][j - 1]}`;
     line = document.getElementById(`${lineID}`)
     line.style.backgroundColor = "red"
   }
+  //draw last line red
   lineID = `${sim["path"][0]}-44`
   line = document.getElementById(lineID)
   line.style.backgroundColor = "red"
 }
-
+//found this function online, modified slightly
 function adjustLine(from, to, line) {
     // get start and end point of each line
   var fT = from.offsetTop + from.offsetHeight / 2;
@@ -202,7 +211,7 @@ function updateStep(step_num, sim){
 
   drawCriticalPath(sim);
 }
-
+//updates the button to disabled or enabled
 function updateButton(step_num, sim){
   let sbutton = document.getElementById(`${step_num}+`);
   let abutton = document.getElementById(`${step_num}-`);

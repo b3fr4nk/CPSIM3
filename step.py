@@ -2,8 +2,6 @@
 class Step():
     
     def __init__(self, step_num, next_steps, default_cost, default_time, step_amount):
-        self.__step_num = step_num
-        self._days_saved = 0
         """
         Args:   next_steps(list)
                 prev_step(list)
@@ -12,11 +10,14 @@ class Step():
                 step_amount(list of ints)
                 acceleration(float) *for scaling price to time savings*
         """
+        self.__step_num = step_num
+        self._days_saved = 0
+        
         self._next_steps = next_steps
         self.__default_cost = default_cost
         self.__default_time = default_time
         self.__step_amount = step_amount
-        self.__slack = self.__step_amount[-1] - self.__default_time
+        # self.__slack = self.__step_amount[-1] - self.__default_time
 
         self.__current_cost = default_cost
 

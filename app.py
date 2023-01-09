@@ -5,7 +5,7 @@ from flask import Flask, request, redirect, render_template, url_for, jsonify
 app = Flask(__name__)
 
 #Sim
-end = Step(44, [], 0, 0, [0])
+end = Step(44, [], 0, 0, [])
 step43 = Step(43, [end], 71360, 22, [540, 600, 650, 730, 820])
 step42 = Step(42, [end], 157500, 20, [920, 1020, 1140, 1290])
 step41 = Step(41, [end], 82720, 22, [1080, 1200, 1310, 1460, 1640, 1840, 2080])
@@ -28,18 +28,18 @@ step25 = Step(25, [step32, step40], 61420, 19, [580, 630, 700, 780])
 step24 = Step(24, [step31], 63330, 18, [780, 890, 1000, 1140, 1320, 1540, 1810, 2190, 2660, 3340])
 step23 = Step(23, [step38], 69040, 21, [460, 500, 550, 620, 700, 790])
 step22 = Step(22, [step26, step27], 7000, 5, [1000, 1660])
-step21 = Step(21, [step25, step29], 20000, 3, [0])
-step20 = Step(20, [step26], 1500, 1, [0])
+step21 = Step(21, [step25, step29], 20000, 3, [])
+step20 = Step(20, [step26], 1500, 1, [])
 step19 = Step(19, [step25, step29], 134160, 23, [4530, 4940, 5410, 5960, 5410, 5960, 6570, 7310, 8170, 9200, 10410])
 step18 = Step(18, [step28, step24], 4830, 3, [1670])
 step17 = Step(17, [step38], 270730, 41, [4270, 4480, 4730, 4970, 5260, 5880, 6240, 6630, 7050, 7530, 8040, 8630])
-step16 = Step(16, [step22], 37500, 15, [0])
+step16 = Step(16, [step22], 37500, 15, [])
 step15 = Step(15, [step23, step30, step20], 256570, 19, [7310, 8170, 9200, 10410, 11910, 13730])
 step14 = Step(14, [step22], 162500, 16, [4160, 4760, 5500, 6410, 7570, 9100])
 step13 = Step(13, [step22], 70620, 16, [1040, 1190, 1380, 1600, 1890])
 step12 = Step(12, [step21, step18], 97630, 19, [2920, 3270])
 step11 = Step(11, [step15], 383330, 15, [23810, 27470, 32050, 37880])
-step10 = Step(10, [step14, step19], 7500, 22, [0])
+step10 = Step(10, [step14, step19], 7500, 22, [])
 step9 = Step(9, [step13], 83150, 19, [730, 820, 920, 1040, 1190])
 step8 = Step(8, [step12], 36110, 18, [650, 740])
 step7 = Step(7, [step9, step8], 4830, 3, [1670])
@@ -47,8 +47,8 @@ step6 = Step(6, [step12], 35710, 21, [290, 310, 400, 390, 440, 500, 570, 660, 77
 step5 = Step(5, [step16, step17], 184840, 33, [2660, 2820])
 step4 = Step(4, [step10, step11], 26230, 13, [770, 900, 1100, 1330])
 step3 = Step(3, [step9], 33420, 14, [500, 580, 680, 820, 1000, 1250, 1600])
-step2 = Step(2, [step6, step7], 5000, 9, [0])
-step1 = Step(1, [step2, step3, step4, step5], 10000, 4, [0])
+step2 = Step(2, [step6, step7], 5000, 9, [])
+step1 = Step(1, [step2, step3, step4, step5], 10000, 4, [])
 
 #dict used to get access individual steps
 # steps_dict = {
@@ -105,13 +105,14 @@ def render_sim():
 
 @app.route('/sim', methods=["GET"])
 def get_sim_data():
-    #main app
+    #sends json of sim to frontend
     start_step = sim.get_start()
     steps = sim.get_json(start_step, start_step.get_step_num())
     steps["num_steps"] = len(steps.keys())
     steps["days"] = sim.get_time()
     steps["path"] = sim.get_cPath()
     steps["cost"] = sim.get_cost()
+    steps["time"] = sim.get_time()
 
     return jsonify(steps)
 
@@ -134,7 +135,8 @@ def progress():
     if request.method == "POST":
         json = request.get_json()
         if json["next"]:
-            return sim.next_day()
+            sim.next_day()
+            return get_sim_data()
        
 
 if __name__ == '__main__':
