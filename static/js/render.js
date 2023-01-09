@@ -24,12 +24,12 @@ function render(sim){
           title.innerHTML = sim[`${i}`]["step"];
         }
         
-
         const addButton = document.createElement("button");
         addButton.innerHTML = "+";
         addButton.setAttribute("id", `${sim[`${i}`]["step"]}-`);
         addButton.setAttribute("class", `${sim[`${i}`]["step"]}`);
         addButton.setAttribute("onClick", `add(this.getAttribute("class"))`)
+        
 
         const subtractButton = document.createElement("button");
         subtractButton.innerHTML = "-";
@@ -66,6 +66,8 @@ function render(sim){
         tree.appendChild(step);
 
         steps.push(step);
+
+        updateButton(i, sim)
     }
 
     days.innerHTML = `Days:${sim["days"]}`;
@@ -95,17 +97,6 @@ function render(sim){
             adjustLine(from, to, line)
 
             linePath = next[j]["step"]
-
-            // if (isRed) {
-            //     for(let k = sim["path"].length -1; k >= 0; k--){
-            //         if (Number(linePath) == Number(sim["path"][k])) {
-            //           line.style.backgroundColor = "red";
-            //         } 
-            //     }
-            //     if(Number(linePath) == 44){
-            //         line.style.backgroundColor = "red";
-            //     }
-            // }
         } 
     }
 
@@ -207,19 +198,28 @@ function updateStep(step_num, sim){
 
   days.innerHTML = `Days:${sim["days"]}`;
 
-  // let sbutton = document.getElementById(`${step_num}+`);
-  // let abutton = document.getElementById(`${step_num}-`)
-  //less than or equal because this is called after being pressed therefore is 1 more than actual
-  // if (sim[`${step_num}`]["reductions"] <= 1) {
-  //   abutton.setAttribute("disabled", "true")
-  //   sbutton.setAttribute("disabled", "false")
-  // }
-  // if (sim[`${step_num}`]["reductions"] > 1){
-  //   abutton.setAttribute("disabled", "false");
-  //   sbutton.setAttribute("disabled", "true");
-  // }
+  updateButton(step_num, sim)
 
   drawCriticalPath(sim);
+}
+
+function updateButton(step_num, sim){
+  let sbutton = document.getElementById(`${step_num}+`);
+  let abutton = document.getElementById(`${step_num}-`);
+  // less than or equal because this is called after being pressed therefore is 1 more than actual
+  if (Number(sim[`${step_num}`]["reductions"]) < 1) {
+    abutton.disabled = false;
+    sbutton.disabled = true;
+  } else if (
+    Number(sim[`${step_num}`]["reductions"]) >=
+    Number(sim[`${step_num}`]["max_reductions"]) - 1
+  ) {
+    abutton.disabled = true;
+    sbutton.disabled = false;
+  } else {
+    abutton.disabled = false;
+    sbutton.disabled = false;
+  }
 }
 
 function progress(){
