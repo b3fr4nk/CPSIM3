@@ -5,6 +5,7 @@ const tree = document.getElementById("sim");
 sim = {}
 
 const days = document.getElementById("days");
+const tCost = document.getElementById("cost")
 
 
 fetch("/sim")
@@ -16,16 +17,24 @@ function render(sim){
     for (let i = 1; i < sim['num_steps']+1; i++) {
         // set up each html element
         const title = document.createElement("h3");
-        title.innerHTML = sim[`${i}`]["step"];
+        if(i == 44){
+          title.innerHTML = "End";
+        }
+        else{
+          title.innerHTML = sim[`${i}`]["step"];
+        }
+        
 
         const addButton = document.createElement("button");
         addButton.innerHTML = "+";
-        addButton.setAttribute("class", sim[`${i}`]["step"])
+        addButton.setAttribute("id", `${sim[`${i}`]["step"]}-`);
+        addButton.setAttribute("class", `${sim[`${i}`]["step"]}`);
         addButton.setAttribute("onClick", `add(this.getAttribute("class"))`)
 
         const subtractButton = document.createElement("button");
         subtractButton.innerHTML = "-";
-        subtractButton.setAttribute("class", sim[`${i}`]["step"])
+        subtractButton.setAttribute("id", `${sim[`${i}`]["step"]}+`)
+        subtractButton.setAttribute("class", `${sim[`${i}`]["step"]}`);
         subtractButton.setAttribute("onClick", `reduce(this.getAttribute("class"))`)
 
 
@@ -60,6 +69,7 @@ function render(sim){
     }
 
     days.innerHTML = `Days:${sim["days"]}`;
+    tCost.innerHTML = `$${sim["cost"]}`
     
     // add lines
     for(let i = 1; i < sim['num_steps']; i++){
@@ -73,10 +83,10 @@ function render(sim){
             }
         }
         
-
         for(let j=0; j < next.length; j++){
             line = document.createElement("div")
-            line.setAttribute("class", "line")           
+            line.setAttribute("class", "line")
+            line.setAttribute("id", `${sim[`${i}`]["step"]}-${next[j]["step"]}`)           
 
             tree.appendChild(line);
 
@@ -86,22 +96,36 @@ function render(sim){
 
             linePath = next[j]["step"]
 
-            if (isRed) {
-                for(let k = sim["path"].length -1; k >= 0; k--){
-                    if (Number(linePath) == Number(sim["path"][k])) {
-                      line.style.backgroundColor = "red";
-                    } 
-                }
-                if(Number(linePath) == 44){
-                    line.style.backgroundColor = "red";
-                }
-            }
-
-            
-        }
-        
+            // if (isRed) {
+            //     for(let k = sim["path"].length -1; k >= 0; k--){
+            //         if (Number(linePath) == Number(sim["path"][k])) {
+            //           line.style.backgroundColor = "red";
+            //         } 
+            //     }
+            //     if(Number(linePath) == 44){
+            //         line.style.backgroundColor = "red";
+            //     }
+            // }
+        } 
     }
 
+    drawCriticalPath(sim)
+}
+
+function drawCriticalPath(sim){
+  lines = document.getElementsByClassName("line") 
+  for(let i = 0; i < lines.length; i++){
+    lines[i].style.backgroundColor = "black";
+  }
+  
+  for(let j = 1; j < sim["path"].length; j++){
+    lineID = `${sim["path"][j]}-${sim["path"][j - 1]}`;
+    line = document.getElementById(`${lineID}`)
+    line.style.backgroundColor = "red"
+  }
+  lineID = `${sim["path"][0]}-44`
+  line = document.getElementById(lineID)
+  line.style.backgroundColor = "red"
 }
 
 function adjustLine(from, to, line) {
@@ -150,12 +174,12 @@ function adjustLine(from, to, line) {
 
 // for when add button is pressed
 function add(step){
-    updateSim(step, true)
+    updateSim(step, false)
 }
 // for when reduce button is pressed
 function reduce(step) {
     
-    updateSim(step, false);
+    updateSim(step, true);
 }
 // updates whole sim 
 function updateSim(step_num, isAdd){
@@ -173,14 +197,29 @@ function updateSim(step_num, isAdd){
 }
 // change the values inside each step
 function updateStep(step_num, sim){
-    cost = document.getElementById(`${step_num}cost`)
-    time = document.getElementById(`${step_num}time`)
+  let cost = document.getElementById(`${step_num}cost`);
+  let time = document.getElementById(`${step_num}time`);
 
-    cost.innerHTML = `$${sim[`${step_num}`]["cost"]}`
-    time.innerHTML = `${sim[`${step_num}`]["time"]} Days`
+  cost.innerHTML = `$${sim[`${step_num}`]["cost"]}`;
+  time.innerHTML = `${sim[`${step_num}`]["time"]} Days`;
+  
+  tCost.innerHTML = `$${sim["cost"]}`
 
-    const days = document.getElementById("days");
-    days.innerHTML = `Days:${sim["days"]}`;
+  days.innerHTML = `Days:${sim["days"]}`;
+
+  // let sbutton = document.getElementById(`${step_num}+`);
+  // let abutton = document.getElementById(`${step_num}-`)
+  //less than or equal because this is called after being pressed therefore is 1 more than actual
+  // if (sim[`${step_num}`]["reductions"] <= 1) {
+  //   abutton.setAttribute("disabled", "true")
+  //   sbutton.setAttribute("disabled", "false")
+  // }
+  // if (sim[`${step_num}`]["reductions"] > 1){
+  //   abutton.setAttribute("disabled", "false");
+  //   sbutton.setAttribute("disabled", "true");
+  // }
+
+  drawCriticalPath(sim);
 }
 
 function progress(){
