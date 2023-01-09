@@ -54,7 +54,7 @@ class Step():
         self.__slack = new_slack
 
     def get_json(self):
-        return {'step':self.get_step_num(), 'next':self.__get_next_json(), 'cost':self.get_cost(), 'time':self.get_time(), 'slack':self.__slack}
+        return {'step':self.get_step_num(), 'next':self.__get_next_json(), 'cost':self.get_cost(), 'time':self.get_time(), 'reductions':len(self.__step_amount)-self._days_saved - 1}
 
     def __get_next_json(self):
         results = []
