@@ -111,6 +111,7 @@ def get_sim_data():
     steps["num_steps"] = len(steps.keys())
     steps["days"] = sim.get_time()
     steps["path"] = sim.get_cPath()
+    steps["cost"] = sim.get_cost()
 
     return jsonify(steps)
 
@@ -122,8 +123,9 @@ def update_sim():
 
         step_num = json["step_num"]
         is_add = json["isAdd"]
-
-        sim.update_step(step_num, is_add)
+        if is_add is not None and step_num is not None:
+            sim.update_step(step_num, is_add)
+            sim.calc(1)
 
     return get_sim_data()
 
