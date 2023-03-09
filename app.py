@@ -1,8 +1,18 @@
 from sim import Sim
 from step import Step
 from flask import Flask, request, redirect, render_template, url_for, jsonify
+from pymongo import MongoClient
 
 app = Flask(__name__)
+client = MongoClient('localhost', 27017)
+db_name = 'cpsim3'
+
+test_client = MongoClient('mongodb://localhost:27017/')
+test_db = test_client[db_name]
+
+db = client["cpsim3"]
+
+sims = db["sims"]
 
 #Sim
 end = Step(44, [], 0, 0, [])
@@ -50,54 +60,8 @@ step3 = Step(3, [step9], 33420, 14, [500, 580, 680, 820, 1000, 1250, 1600])
 step2 = Step(2, [step6, step7], 5000, 9, [])
 step1 = Step(1, [step2, step3, step4, step5], 10000, 4, [])
 
-#dict used to get access individual steps
-# steps_dict = {
-#     "1":step1,
-#     "2":step2,
-#     "3":step3,
-#     "4":step4,
-#     "5":step5,
-#     "6":step6,
-#     "7":step7,
-#     "8":step8,
-#     "9":step9,
-#     "10":step10,
-#     "11":step11,
-#     "12":step12,
-#     "13":step13,
-#     "14":step14,
-#     "15":step15,
-#     "16":step16,
-#     "17":step17,
-#     "18":step18,
-#     "19":step19,
-#     "20":step20,
-#     "21":step21,
-#     "22":step22,
-#     "23":step23,
-#     "24":step24,
-#     "25":step25,
-#     "26":step26,
-#     "27":step27,
-#     "28":step28,
-#     "29":step29,
-#     "30":step30,
-#     "31":step31,
-#     "32":step32,
-#     "33":step33,
-#     "34":step34,
-#     "35":step35,
-#     "36":step36,
-#     "37":step37,
-#     "38":step38,
-#     "39":step39,
-#     "40":step40,
-#     "41":step41,
-#     "42":step42,
-#     "43":step43
-#     }
-
 sim = Sim(step1, 107, 0)
+
 #Routes
 @app.route("/")
 def render_sim():
@@ -105,6 +69,7 @@ def render_sim():
 
 @app.route('/sim', methods=["GET"])
 def get_sim_data():
+    
     #sends json of sim to frontend
     start_step = sim.get_start()
     steps = sim.get_json(start_step, start_step.get_step_num())
@@ -139,5 +104,15 @@ def progress():
             return get_sim_data()
        
 
+def check_for_db(test_client,db_name):
+    dblist = test_client.list_database_names()
+    if db_name in dblist:
+        print(db_name + ' ← database exists')
+    else:
+        print(db_name + ' ← database does NOT exists')
+
+check_for_db(test_client,db_name) # check if database exists or not
+
 if __name__ == '__main__':
     app.run(debug=True)
+
