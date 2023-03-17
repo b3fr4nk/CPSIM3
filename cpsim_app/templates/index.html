@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -9,19 +10,18 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
+
+    <a href="{{url_for('auth.signup')}}">Sign Up</a>
+
     <div class="tree">
         <ul id="sim">
-
 
         <button onclick="progress()", id="progress">Advance Date</button>
         <p id="days">days:</p>
         <p id="cost">Cost:</p>
         </ul>
 
-        
     </div>
-    
-    
 
     <script src="{{ url_for('static', filename='js/render.js') }}"></script>
 </body>
