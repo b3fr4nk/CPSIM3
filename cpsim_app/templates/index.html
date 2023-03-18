@@ -11,8 +11,8 @@
 </head>
 <body>
 
-    <a href="{{url_for('auth.signup')}}">Sign Up</a>
-
+    {% extends 'navbar.html' %}
+    {% block content %}
     <div class="tree">
         <ul id="sim">
 
@@ -24,5 +24,7 @@
     </div>
 
     <script src="{{ url_for('static', filename='js/render.js') }}"></script>
+
+    {% endblock %}
 </body>
 </html>
