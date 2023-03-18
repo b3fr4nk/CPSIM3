@@ -61,6 +61,16 @@ step2 = Step(2, [step6, step7], 5000, 9, [])
 step1 = Step(1, [step2, step3, step4, step5], 10000, 4, [])
 
 sim = Sim(step1, 107, 0)
+start_step = sim.get_start()
+steps = sim.get_json(start_step, start_step.get_step_num())
+
+
+def save_sim():
+    file_path = f'{os.path.join(app.config["SIM_FOLDER"])}{current_user.id}.json'
+    file = open(file_path, 'w')
+
+    json.dump(steps, file)
+    file.close
 
 #Routes
 @main.route("/")
@@ -81,9 +91,7 @@ def get_sim_data():
     steps["cost"] = sim.get_cost()
     steps["time"] = sim.get_time()
 
-    file = open(f'{os.path.join(app.config["SIM_FOLDER"])}{current_user.id}.json', 'w')
-
-    json.dump(steps, file)
+    
     return steps
 
 
@@ -138,8 +146,19 @@ def login():
         user = User.query.filter_by(school_email=form.email.data).first()
         login_user(user, remember=True)
 
+        file_path = f'{os.path.join(app.config["SIM_FOLDER"])}{current_user.id}.json'
 
+        sim = Sim(step1, 107, 0)
+        save_sim()
+
+        sim = sim.load_json(file_path)
 
         return redirect(url_for('main.render_sim'))
 
     return render_template('login.html', form=form)
+
+@auth.route('/logout', methods=['POST'])
+def logout():
+    logout_user()
+
+    return redirect(url_for('main.render_sim'))
