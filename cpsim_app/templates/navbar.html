@@ -1,0 +1,15 @@
+<h1>CPSIM3</h1>
+
+{% if current_user.is_authenticated %}
+
+    <a href="{{url_for('auth.logout')}}">Log Out</a>
+
+{% else%}
+
+    <a href="{{url_for('auth.signup')}}">Sign Up</a>
+    <a href="{{url_for('auth.login')}}">Log In</a>
+
+{% endif %}
+
+{% block content %}
+{% endblock %}
