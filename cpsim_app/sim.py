@@ -147,7 +147,9 @@ class Sim():
         return list1
     def next_day(self):
 
-        if self.__current_day < self._current_time:
+        time_left = self.deadline - self.__current_day
+
+        if time_left > 0:
             output = self.calc(1)
             self._current_cost = output['cost']
             self._current_time = output['time']
@@ -155,9 +157,9 @@ class Sim():
             
             self.__current_day += 1
 
-            return {"running":True, "cost":self._current_cost, "time":self._time_remaining}
+            return {"running":True, "cost":self._current_cost, "time":self._time_remaining, "deadline":time_left}
 
-        return {"running":False, "cost":self._current_cost, "time":self.__current_day}
+        return {"running":False, "cost":self._current_cost, "time":self.__current_day, "deadline":time_left}
 
 
 #testing stuff
