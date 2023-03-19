@@ -60,7 +60,8 @@ step3 = Step(3, [step9], 33420, 14, [500, 580, 680, 820, 1000, 1250, 1600])
 step2 = Step(2, [step6, step7], 5000, 9, [])
 step1 = Step(1, [step2, step3, step4, step5], 10000, 4, [])
 
-sim = Sim(step1, 107, 0)
+random_events = 0
+sim = Sim(step1, 107, random_events)
 start_step = sim.get_start()
 steps = sim.get_json(start_step, start_step.get_step_num())
 
@@ -83,14 +84,11 @@ def get_sim_data():
     #TODO allow users to use sim without logging in 
     
     #sends json of sim to frontend
-    start_step = sim.get_start()
-    steps = sim.get_json(start_step, start_step.get_step_num())
     steps["num_steps"] = len(steps.keys())
     steps["days"] = sim.get_time()
     steps["path"] = sim.get_cPath()
     steps["cost"] = sim.get_cost()
     steps["time"] = sim.get_time()
-
     
     return steps
 
@@ -115,7 +113,8 @@ def progress():
     if request.method == "POST":
         json = request.get_json()
         if json["next"]:
-            sim.next_day()
+            steps.update(sim.next_day())
+            print(steps)
             return get_sim_data()
 
 @auth.route('/signup', methods=['POST', 'GET'])
@@ -124,18 +123,14 @@ def signup():
 
     if form.validate_on_submit():
         hashed_password = bcrypt.generate_password_hash(form.password.data)
-        user_sim = SimDoc()
+        user_sim = SimDoc() #TODO add path to json to db
         user = User(school_email=form.email.data, password=hashed_password)
 
         db.session.add(user)
         db.session.commit()
-        print("signed up")
-
-    
 
         return redirect(url_for('auth.login'))
 
-    print("not signedup")
     return render_template('signup.html', form=form)
 
 @auth.route('/login', methods=['POST', 'GET'])
@@ -148,7 +143,7 @@ def login():
 
         file_path = f'{os.path.join(app.config["SIM_FOLDER"])}{current_user.id}.json'
 
-        sim = Sim(step1, 107, 0)
+        sim = Sim(step1, 107, random_events)
         save_sim()
 
         sim = sim.load_json(file_path)
