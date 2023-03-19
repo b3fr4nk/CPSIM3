@@ -6,6 +6,7 @@ sim = {}
 
 const days = document.getElementById("days");
 const tCost = document.getElementById("cost")
+const deadline = document.getElementById("deadline")
 
 
 fetch("/sim")
@@ -14,7 +15,7 @@ fetch("/sim")
     
 function render(sim){
     // add steps
-    for (let i = 1; i < sim['num_steps']+1; i++) {
+    for (let i = 1; i < 44; i++) {
         // set up each html element
         const title = document.createElement("h3");
         if(i == 44){
@@ -79,9 +80,10 @@ function render(sim){
 
     days.innerHTML = `Days:${sim["days"]}`;
     tCost.innerHTML = `$${sim["cost"]}`
+    deadline.innerHTML = `Deadline: Ends in ${sim["deadline"]}`
     
     // add lines
-    for(let i = 1; i < sim['num_steps']; i++){
+    for(let i = 1; i < 44; i++){
         from = document.getElementById(`s${sim[`${i}`]["step"]}`);
         next = sim[`${i}`]["next"];
         isRed = false
@@ -91,14 +93,15 @@ function render(sim){
               isRed = true;
             }
         }
-        
         for(let j=0; j < next.length; j++){
             line = document.createElement("div")
             line.setAttribute("class", "line")
             line.setAttribute("id", `${sim[`${i}`]["step"]}-${next[j]["step"]}`)           
 
             tree.appendChild(line);
-
+            if(next[j]["step"] === 44){
+              break
+            }
             to = document.getElementById(`s${next[j]["step"]}`)
 
             adjustLine(from, to, line)
@@ -242,5 +245,5 @@ function progress(){
       body: JSON.stringify({"next":true}),
     })
       .then((response) => response.json())
-      .then((response) => console.log(response));
+      .then((response) => render(response));
 }
