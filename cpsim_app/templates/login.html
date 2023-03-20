@@ -6,9 +6,19 @@
         {{form.email.label}}
 
         {{form.email}}
+        <ul>
+            {% for error in form.email.errors %}
+                <li class="error">{{error}}</li>
+            {% endfor %}
+        </ul>
 
         {{form.password.label}}
         {{form.password}}
+        <ul>
+            {% for error in form.password.errors %}
+                <li class="error">{{error}}</li>
+            {% endfor %}
+        </ul>
 
         {{form.submit}}
 
