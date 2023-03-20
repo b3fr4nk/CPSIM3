@@ -45,33 +45,34 @@ class Sim():
 
         return results
 
-    def load_json(self, file_path):
-        file = open(file_path, 'r')
-        sim_data = json.load(file)
-        file.close
+    # def load_json(self, file_path):
+    #     file = open(file_path, 'r')
+    #     sim_data = json.load(file)
+    #     file.close
 
-        temp_steps_dict = {}
-        end = Step(44, [], 0, 0, [])
+    #     temp_steps_dict = {}
+    #     end = Step(44, [], 0, 0, [])
 
-        temp_steps_dict['44'] = end
+    #     temp_steps_dict['44'] = end
         
 
-        for step_key in range(len(self._steps.keys()) -1 , 0, -1):
-            step = sim_data[f'{step_key}']
-            print(step)
-            next_steps_list = []
+    #     for step_key in range(len(self._steps.keys()) - 1 , 0, -1):
+    #         step = sim_data[f'{step_key}']
+    #         print(step)
+    #         next_steps_list = []
             
-            for next_step in step['next']:
-                next_steps_list.append(temp_steps_dict[f'{next_step["step"]}'])
-            new_step = Step(step['step'], next_steps_list, self._steps[f'{step_key}'].get_cost(), self._steps[f'{step_key}'].get_time(), [0])
-            temp_steps_dict[f'{step_key}'] = new_step
+    #         for next_step in step['next']:
+    #             next_steps_list.append(temp_steps_dict[f'{next_step["step"]}'])
+    #         step_amount = self._steps[f'{step_key}'].get_step_amount()
+    #         new_step = Step(step['step'], next_steps_list, self._steps[f'{step_key}'].get_cost(), self._steps[f'{step_key}'].get_time(), step_amount)
+    #         temp_steps_dict[f'{step_key}'] = new_step
 
-        self._steps = temp_steps_dict
+    #     self._steps = temp_steps_dict
 
-    def step_from_dict(self, dict, next_steps):
-        step = Step(dict['step'], next_steps)
+    # def step_from_dict(self, dict, next_steps):
+    #     step = Step(dict['step'], next_steps)
 
-        return step
+    #     return step
 
     def update_step(self, step_num, isAdd):
         step = self.__start_step

@@ -8,6 +8,7 @@ from werkzeug.utils import secure_filename
 import json
 from cpsim_app.forms import LoginForm, SignUpForm
 import os
+import pickle
 
 from cpsim_app.extensions import db, app, bcrypt
 
@@ -67,11 +68,15 @@ steps = sim.get_json(start_step, start_step.get_step_num())
 
 
 def save_sim():
-    file_path = f'{os.path.join(app.config["SIM_FOLDER"])}{current_user.id}.json'
-    file = open(file_path, 'w')
+    file_path = f'{os.path.join(app.config["SIM_FOLDER"])}{current_user.id}.pkl'
+    with open(file_path, 'wb') as outp:
+        pickle.dump(sim, outp, pickle.HIGHEST_PROTOCOL)
 
-    json.dump(steps, file)
-    file.close
+def load_sim():
+    file_path = f'{os.path.join(app.config["SIM_FOLDER"])}{current_user.id}.pkl'
+    with open(file_path, 'rb') as inp:
+        global sim
+        sim = pickle.load(inp)
 
 #Routes
 @main.route("/")
@@ -82,8 +87,9 @@ def render_sim():
 @login_required
 def get_sim_data():
     #TODO allow users to use sim without logging in 
-    
+    global steps
     #sends json of sim to frontend
+    steps = sim.get_json(start_step, start_step.get_step_num())
     steps["num_steps"] = len(steps.keys())
     steps["days"] = sim.get_time()
     steps["path"] = sim.get_cPath()
@@ -104,6 +110,7 @@ def update_sim():
         if is_add is not None and step_num is not None:
             sim.update_step(step_num, is_add)
             sim.calc(1)
+        save_sim()
 
     return get_sim_data()
 
@@ -114,8 +121,7 @@ def progress():
         json = request.get_json()
         if json["next"]:
             steps.update(sim.next_day())
-            print(steps)
-            return get_sim_data()
+        return get_sim_data()
 
 @auth.route('/signup', methods=['POST', 'GET'])
 def signup():
@@ -141,18 +147,19 @@ def login():
         user = User.query.filter_by(school_email=form.email.data).first()
         login_user(user, remember=True)
 
+        global file_path
+
         file_path = f'{os.path.join(app.config["SIM_FOLDER"])}{current_user.id}.json'
-
-        sim = Sim(step1, 107, random_events)
-        save_sim()
-
-        sim = sim.load_json(file_path)
+        try:
+            load_sim()
+        except FileNotFoundError:
+            save_sim()
 
         return redirect(url_for('main.render_sim'))
 
     return render_template('login.html', form=form)
 
-@auth.route('/logout', methods=['POST'])
+@auth.route('/logout', methods=['POST', 'GET'])
 def logout():
     logout_user()
 
