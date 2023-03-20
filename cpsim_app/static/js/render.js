@@ -27,14 +27,14 @@ function render(sim){
         
         const addButton = document.createElement("button");
         addButton.innerHTML = "+";
-        addButton.setAttribute("id", `${sim[`${i}`]["step"]}-`);
+        addButton.setAttribute("id", `${sim[`${i}`]["step"]}+`);
         addButton.setAttribute("class", `${sim[`${i}`]["step"]}`);
         addButton.setAttribute("onClick", `add(this.getAttribute("class"))`)
         
 
         const subtractButton = document.createElement("button");
         subtractButton.innerHTML = "-";
-        subtractButton.setAttribute("id", `${sim[`${i}`]["step"]}+`)
+        subtractButton.setAttribute("id", `${sim[`${i}`]["step"]}-`)
         subtractButton.setAttribute("class", `${sim[`${i}`]["step"]}`);
         subtractButton.setAttribute("onClick", `reduce(this.getAttribute("class"))`)
 
@@ -42,9 +42,6 @@ function render(sim){
         editButtons.appendChild(addButton);
         editButtons.appendChild(subtractButton);
         editButtons.setAttribute("class", "edit");
-
-        
-        
 
         const time = document.createElement("p");
         time.innerHTML = `${sim[`${i}`]["time"]} Days`;
@@ -80,7 +77,7 @@ function render(sim){
 
     days.innerHTML = `Days:${sim["days"]}`;
     tCost.innerHTML = `$${sim["cost"]}`
-    deadline.innerHTML = `Deadline: Ends in ${sim["deadline"]}`
+    
     
     // add lines
     for(let i = 1; i < 44; i++){
@@ -216,16 +213,13 @@ function updateStep(step_num, sim){
 }
 //updates the button to disabled or enabled
 function updateButton(step_num, sim){
-  let sbutton = document.getElementById(`${step_num}+`);
-  let abutton = document.getElementById(`${step_num}-`);
+  let sbutton = document.getElementById(`${step_num}-`);
+  let abutton = document.getElementById(`${step_num}+`);
   // less than or equal because this is called after being pressed therefore is 1 more than actual
   if (Number(sim[`${step_num}`]["reductions"]) < 1) {
     abutton.disabled = false;
     sbutton.disabled = true;
-  } else if (
-    Number(sim[`${step_num}`]["reductions"]) >=
-    Number(sim[`${step_num}`]["max_reductions"]) - 1
-  ) {
+  } else if (Number(sim[`${step_num}`]["reductions"]) > Number(sim[`${step_num}`]["max_reductions"]) - 1) {
     abutton.disabled = true;
     sbutton.disabled = false;
   } else {
@@ -245,5 +239,5 @@ function progress(){
       body: JSON.stringify({"next":true}),
     })
       .then((response) => response.json())
-      .then((response) => render(response));
+      .then((response) => deadline.innerHTML = `Deadline: Ends in ${response["deadline"]}`);
 }
