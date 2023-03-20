@@ -1,7 +1,6 @@
 class Step():
     
     def __init__(self, step_num, next_steps, default_cost, default_time, step_amount):
-        #TODO change default time/cost to a list of times and
         """
         Args:   next_steps(list)
                 prev_step(list)
