@@ -16,6 +16,7 @@ class Step():
         self.__default_cost = default_cost
         self.__default_time = default_time
         self.__step_amount = step_amount
+        self.is_active = True
         # self.__slack = self.__step_amount[-1] - self.__default_time
 
         self.__current_cost = default_cost
@@ -49,12 +50,15 @@ class Step():
 
     def get_slack(self):
         return self.__slack
+
+    def add_delay(self, days):
+        self._days_saved -= days
         
     def set_slack(self, new_slack):
         self.__slack = new_slack
 
     def get_json(self):
-        return {'step':self.get_step_num(), 'next':self.__get_next_json(), 'cost':self.get_cost(), 'time':self.get_time(), 'reductions':len(self.__step_amount)-self._days_saved - 1, 'max_reductions':len(self.__step_amount)}
+        return {'step':self.get_step_num(), 'next':self.__get_next_json(), 'cost':self.get_cost(), 'time':self.get_time(), 'reductions':len(self.__step_amount)-self._days_saved - 1, 'max_reductions':len(self.__step_amount), 'is_active':self.is_active}
 
     def __get_next_json(self):
         results = []

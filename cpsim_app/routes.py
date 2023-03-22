@@ -1,5 +1,6 @@
 from cpsim_app.sim import Sim
 from cpsim_app.step import Step
+from cpsim_app.event import Event
 from flask import Blueprint, request, render_template, redirect, url_for, flash
 from datetime import date, datetime
 from cpsim_app.models import User, SimDoc
@@ -61,10 +62,10 @@ step3 = Step(3, [step9], 33420, 14, [500, 580, 680, 820, 1000, 1250, 1600])
 step2 = Step(2, [step6, step7], 5000, 9, [])
 step1 = Step(1, [step2, step3, step4, step5], 10000, 4, [])
 
-random_events = 0
+random_events = [Event(3, 25, 14), Event(1, 31, 35), Event(4, 74, 43)]
 sim = Sim(step1, 107, random_events)
 start_step = sim.get_start()
-steps = sim.get_json(start_step, start_step.get_step_num())
+steps = sim.get_json()
 
 
 def save_sim():
@@ -89,7 +90,7 @@ def get_sim_data():
     #TODO allow users to use sim without logging in 
     global steps
     #sends json of sim to frontend
-    steps = sim.get_json(start_step, start_step.get_step_num())
+    steps = sim.get_json()
     steps["num_steps"] = len(steps.keys())
     steps["days"] = sim.get_time()
     steps["path"] = sim.get_cPath()
@@ -120,7 +121,11 @@ def progress():
     if request.method == "POST":
         json = request.get_json()
         if json["next"]:
-            steps.update(sim.next_day())
+            sim.next_day()
+            if sim._time_remaining <= 1:
+                save_sim()
+                flash('sim complete')
+                
         return get_sim_data()
 
 @auth.route('/signup', methods=['POST', 'GET'])
@@ -129,10 +134,13 @@ def signup():
 
     if form.validate_on_submit():
         hashed_password = bcrypt.generate_password_hash(form.password.data)
-        user_sim = SimDoc() #TODO add path to json to db
+        
         user = User(school_email=form.email.data, password=hashed_password)
+        file_path = f'{os.path.join(app.config["SIM_FOLDER"])}{user.id}.pkl'
+        user_sim = SimDoc(doc=file_path)
 
         db.session.add(user)
+        db.session.add(user_sim)
         db.session.commit()
 
         return redirect(url_for('auth.login'))

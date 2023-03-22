@@ -4,9 +4,9 @@ const tree = document.getElementById("sim");
 
 sim = {}
 
-const days = document.getElementById("days");
+const remaining = document.getElementById("days");
 const tCost = document.getElementById("cost")
-const deadline = document.getElementById("deadline")
+const day = document.getElementById("day")
 
 
 fetch("/sim")
@@ -24,6 +24,8 @@ function render(sim){
         else{
           title.innerHTML = sim[`${i}`]["step"];
         }
+
+        day.innerHTML = `Day ${sim["day"]}`
         
         const addButton = document.createElement("button");
         addButton.innerHTML = "+";
@@ -31,7 +33,6 @@ function render(sim){
         addButton.setAttribute("class", `${sim[`${i}`]["step"]}`);
         addButton.setAttribute("onClick", `add(this.getAttribute("class"))`)
         
-
         const subtractButton = document.createElement("button");
         subtractButton.innerHTML = "-";
         subtractButton.setAttribute("id", `${sim[`${i}`]["step"]}-`)
@@ -75,7 +76,7 @@ function render(sim){
         }
     }
 
-    days.innerHTML = `Days:${sim["days"]}`;
+    remaining.innerHTML = `Time Remaining:${sim["days"]}`;
     tCost.innerHTML = `$${sim["cost"]}`
     
     
@@ -110,6 +111,25 @@ function render(sim){
     drawCriticalPath(sim)
 }
 
+function render_progress(sim){
+  day.innerHTML = `Day ${sim["day"]}`
+
+  for(let i = 1; i < 44; i++){
+    const addButton = document.getElementById(`${i}+`)
+    const subtractButton = document.getElementById(`${i}-`)
+    const step = document.getElementById(`s${i}`)
+
+    if(sim[`${i}`]['is_active'] === false){
+      if(addButton !== null && subtractButton !== null){
+        addButton.disabled = true
+        subtractButton.disabled = true
+      }
+
+      step.style.backgroundColor = '#808080'
+    }
+  }
+}
+
 function drawCriticalPath(sim){
   //change all lines to black
   lines = document.getElementsByClassName("line") 
@@ -126,6 +146,7 @@ function drawCriticalPath(sim){
   lineID = `${sim["path"][0]}-44`
   line = document.getElementById(lineID)
   line.style.backgroundColor = "red"
+
 }
 //found this function online, modified slightly
 function adjustLine(from, to, line) {
@@ -200,12 +221,13 @@ function updateStep(step_num, sim){
   let cost = document.getElementById(`${step_num}cost`);
   let time = document.getElementById(`${step_num}time`);
 
+
   cost.innerHTML = `$${sim[`${step_num}`]["cost"]}`;
   time.innerHTML = `${sim[`${step_num}`]["time"]} Days`;
   
   tCost.innerHTML = `$${sim["cost"]}`
 
-  days.innerHTML = `Days:${sim["days"]}`;
+  remaining.innerHTML = `Time Remaining:${sim["days"]}`;
 
   updateButton(step_num, sim)
 
@@ -239,5 +261,5 @@ function progress(){
       body: JSON.stringify({"next":true}),
     })
       .then((response) => response.json())
-      .then((response) => deadline.innerHTML = `Deadline: Ends in ${response["deadline"]}`);
+      .then((response) => render_progress(response))
 }

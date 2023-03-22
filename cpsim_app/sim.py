@@ -1,5 +1,6 @@
 import time
 from cpsim_app.step import Step
+from cpsim_app.event import Event
 import json
 
 class Sim():
@@ -10,7 +11,9 @@ class Sim():
     def __init__(self, start_step, deadline, change_events):
         self.__start_step = start_step
         self.deadline = deadline
-        self.__change_events = change_events #TODO implement change events
+        self.current_day = 0
+        self.__change_events = change_events
+        self.time_left = deadline
 
         self._time_remaining = deadline
         self._cpath = []
@@ -20,7 +23,7 @@ class Sim():
         output = self.calc(1)
         self._current_cost = output['cost']
         self._current_time = output['time']
-        self.__current_day = 0
+        
 
     def get_start(self):
         return self.__start_step
@@ -34,7 +37,7 @@ class Sim():
 
         return steps
 
-    def get_json(self, step1, step_num):
+    def get_json(self):
         results = {}
 
         steps = self._steps
@@ -43,36 +46,9 @@ class Sim():
             step_json = steps[step].get_json()
             results[f'{step_json["step"]}'] = step_json
 
+        results['day'] = self.current_day
+
         return results
-
-    # def load_json(self, file_path):
-    #     file = open(file_path, 'r')
-    #     sim_data = json.load(file)
-    #     file.close
-
-    #     temp_steps_dict = {}
-    #     end = Step(44, [], 0, 0, [])
-
-    #     temp_steps_dict['44'] = end
-        
-
-    #     for step_key in range(len(self._steps.keys()) - 1 , 0, -1):
-    #         step = sim_data[f'{step_key}']
-    #         print(step)
-    #         next_steps_list = []
-            
-    #         for next_step in step['next']:
-    #             next_steps_list.append(temp_steps_dict[f'{next_step["step"]}'])
-    #         step_amount = self._steps[f'{step_key}'].get_step_amount()
-    #         new_step = Step(step['step'], next_steps_list, self._steps[f'{step_key}'].get_cost(), self._steps[f'{step_key}'].get_time(), step_amount)
-    #         temp_steps_dict[f'{step_key}'] = new_step
-
-    #     self._steps = temp_steps_dict
-
-    # def step_from_dict(self, dict, next_steps):
-    #     step = Step(dict['step'], next_steps)
-
-    #     return step
 
     def update_step(self, step_num, isAdd):
         step = self.__start_step
@@ -118,6 +94,9 @@ class Sim():
         curr_time = time + self._steps[f"{step_num}"].get_time()
         next_time = curr_time
         cPath = [step_num]
+
+        if curr_time < self.current_day:
+            self._steps[f"{step_num}"].is_active = False
         
         if len(self._steps[f"{step_num}"].get_next()) > 0:
             fast_time = curr_time + self._steps[f"{step_num}"].get_next()[0].get_time()
@@ -134,8 +113,6 @@ class Sim():
                 if temp_time < fast_time:
                     fast_time = temp_time
         
-            # self._steps[f"{step_num}"].set_slack(self._calc_slack(fast_time, next_time))
-        
         return [next_time, cPath]
         
 
@@ -146,21 +123,29 @@ class Sim():
         for item in list2:
             list1.append(item)
         return list1
+
+    def event(self):
+        for event in self.__change_events:
+            if event.day == self.current_day:
+                self._steps[f'{event.step_num}'].add_delay(event.delay)
+
     def next_day(self):
 
-        time_left = self.deadline - self.__current_day
+        time_left = self.deadline - self.current_day
 
-        if time_left > 0:
+        if self.current_day <= self._current_time:
             output = self.calc(1)
             self._current_cost = output['cost']
             self._current_time = output['time']
-            self._time_remaining = self._current_time - self.__current_day
+            self._time_remaining = time_left
             
-            self.__current_day += 1
+            self.event()
 
-            return {"running":True, "cost":self._current_cost, "time":self._time_remaining, "deadline":time_left}
+            self.current_day += 1
 
-        return {"running":False, "cost":self._current_cost, "time":self.__current_day, "deadline":time_left}
+            return {"running":True, "cost":self._current_cost, "time":self._time_remaining, "day":self.current_day}
+
+        return {"running":False, "cost":self._current_cost, "time":self.current_day, "day":self.current_day}
 
 
 #testing stuff
