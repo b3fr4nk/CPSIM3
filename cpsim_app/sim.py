@@ -15,7 +15,7 @@ class Sim():
         self.__change_events = change_events
         self.time_left = deadline
 
-        self._time_remaining = deadline
+        self.running = True
         self._cpath = []
 
         self._steps = self.get_steps_dict(self.__start_step)
@@ -133,19 +133,16 @@ class Sim():
 
         time_left = self.deadline - self.current_day
 
-        if self.current_day <= self._current_time:
+        if self.current_day < self._current_time:
             output = self.calc(1)
             self._current_cost = output['cost']
             self._current_time = output['time']
-            self._time_remaining = time_left
             
             self.event()
 
             self.current_day += 1
-
-            return {"running":True, "cost":self._current_cost, "time":self._time_remaining, "day":self.current_day}
-
-        return {"running":False, "cost":self._current_cost, "time":self.current_day, "day":self.current_day}
+        else:
+            self.running = False
 
 
 #testing stuff

@@ -122,9 +122,9 @@ def progress():
         json = request.get_json()
         if json["next"]:
             sim.next_day()
-            if sim._time_remaining <= 1:
+            if not sim.running:
                 save_sim()
-                flash('sim complete')
+                #TODO add a submissions page and redirect to it
                 
         return get_sim_data()
 

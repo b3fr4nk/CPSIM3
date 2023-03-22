@@ -113,11 +113,18 @@ function render(sim){
 
 function render_progress(sim){
   day.innerHTML = `Day ${sim["day"]}`
+  tCost.innerHTML = `$${sim["cost"]}`
+  remaining.innerHTML = `Time Remaining: ${sim["days"]}`
 
   for(let i = 1; i < 44; i++){
     const addButton = document.getElementById(`${i}+`)
     const subtractButton = document.getElementById(`${i}-`)
     const step = document.getElementById(`s${i}`)
+    const cost = document.getElementById(`${i}cost`)
+    const time = document.getElementById(`${i}time`)
+
+    time.innerHTML = `${sim[`${i}`]["time"]} Days`
+    cost.innerHTML = `$${sim[`${i}`]["cost"]}`
 
     if(sim[`${i}`]['is_active'] === false){
       if(addButton !== null && subtractButton !== null){
