@@ -142,13 +142,12 @@ def show_results():
         sims = []
         for student in students:
             sim = SimDoc.query.filter_by(user_id=student.id).first()
-            print(sim)
             sims.append(sim)
-            names.append(student.school_email)
+            names.append(student)
         
         context = {
             'students':names,
-            'sim':sims
+            'sims':sims
         }
 
         print(context)
