@@ -2,12 +2,16 @@
 
 {% if current_user.is_authenticated %}
 
-    <a href="{{url_for('auth.logout')}}">Log Out</a>
+    <a class="navlink" href="{{url_for('auth.logout')}}">Log Out</a>
+
+    {% if current_user.is_teacher %}
+        <a class="navlink" href="{{url_for('main.show_results')}}">Grades</a>
+    {% endif %}
 
 {% else%}
 
-    <a href="{{url_for('auth.signup')}}">Sign Up</a>
-    <a href="{{url_for('auth.login')}}">Log In</a>
+    <a class="navlink" href="{{url_for('auth.signup')}}">Sign Up</a>
+    <a class="navlink" href="{{url_for('auth.login')}}">Log In</a>
 
 {% endif %}
 

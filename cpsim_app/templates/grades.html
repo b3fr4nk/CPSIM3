@@ -1,17 +1,33 @@
-<h1>{{current_user.class_code}}</h1>
+<!DOCTYPE html>
 
-<ul class="student-names">
-    <h3>Student</h3>
-    {% for student in students %}
-        <li>{{student.school_email}}</li>
-    {% endfor %}
-</ul>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CPSIM3</title>
 
-<ul class="student-sims">
-    <h3>Sim</h3>
-    {% for sim in sims %}
-        <li class="sim-results">${{sim.cost}}</li>
-    {% endfor%}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <h1>Class: {{current_user.class_code}}</h1>
+    <div class="grade-container">
+        <ul class="student-names">
+        <h3>Student</h3>
+        {% for student in students %}
+            <li>{{student.school_email}}</li>
+        {% endfor %}
+    </ul>
+
+    <ul class="student-sims">
+        <h3>Cost</h3>
+        {% for sim in sims %}
+            <li class="sim-results">${{sim.cost}}</li>
+        {% endfor%}
 </ul>
+</div>
+</body>
+
+
 
 
