@@ -4,8 +4,9 @@ const tree = document.getElementById("sim");
 
 sim = {}
 
-const days = document.getElementById("days");
+const remaining = document.getElementById("days");
 const tCost = document.getElementById("cost")
+const day = document.getElementById("day")
 
 
 fetch("/sim")
@@ -14,7 +15,7 @@ fetch("/sim")
     
 function render(sim){
     // add steps
-    for (let i = 1; i < sim['num_steps']+1; i++) {
+    for (let i = 1; i < 44; i++) {
         // set up each html element
         const title = document.createElement("h3");
         if(i == 44){
@@ -23,17 +24,18 @@ function render(sim){
         else{
           title.innerHTML = sim[`${i}`]["step"];
         }
+
+        day.innerHTML = `Day ${sim["day"]}`
         
         const addButton = document.createElement("button");
         addButton.innerHTML = "+";
-        addButton.setAttribute("id", `${sim[`${i}`]["step"]}-`);
+        addButton.setAttribute("id", `${sim[`${i}`]["step"]}+`);
         addButton.setAttribute("class", `${sim[`${i}`]["step"]}`);
         addButton.setAttribute("onClick", `add(this.getAttribute("class"))`)
         
-
         const subtractButton = document.createElement("button");
         subtractButton.innerHTML = "-";
-        subtractButton.setAttribute("id", `${sim[`${i}`]["step"]}+`)
+        subtractButton.setAttribute("id", `${sim[`${i}`]["step"]}-`)
         subtractButton.setAttribute("class", `${sim[`${i}`]["step"]}`);
         subtractButton.setAttribute("onClick", `reduce(this.getAttribute("class"))`)
 
@@ -41,9 +43,6 @@ function render(sim){
         editButtons.appendChild(addButton);
         editButtons.appendChild(subtractButton);
         editButtons.setAttribute("class", "edit");
-
-        
-        
 
         const time = document.createElement("p");
         time.innerHTML = `${sim[`${i}`]["time"]} Days`;
@@ -77,11 +76,12 @@ function render(sim){
         }
     }
 
-    days.innerHTML = `Days:${sim["days"]}`;
+    remaining.innerHTML = `Time Remaining:${sim["days"]}`;
     tCost.innerHTML = `$${sim["cost"]}`
     
+    
     // add lines
-    for(let i = 1; i < sim['num_steps']; i++){
+    for(let i = 1; i < 44; i++){
         from = document.getElementById(`s${sim[`${i}`]["step"]}`);
         next = sim[`${i}`]["next"];
         isRed = false
@@ -91,14 +91,15 @@ function render(sim){
               isRed = true;
             }
         }
-        
         for(let j=0; j < next.length; j++){
             line = document.createElement("div")
             line.setAttribute("class", "line")
             line.setAttribute("id", `${sim[`${i}`]["step"]}-${next[j]["step"]}`)           
 
             tree.appendChild(line);
-
+            if(next[j]["step"] === 44){
+              break
+            }
             to = document.getElementById(`s${next[j]["step"]}`)
 
             adjustLine(from, to, line)
@@ -108,6 +109,32 @@ function render(sim){
     }
 
     drawCriticalPath(sim)
+}
+
+function render_progress(sim){
+  day.innerHTML = `Day ${sim["day"]}`
+  tCost.innerHTML = `$${sim["cost"]}`
+  remaining.innerHTML = `Time Remaining: ${sim["days"]}`
+
+  for(let i = 1; i < 44; i++){
+    const addButton = document.getElementById(`${i}+`)
+    const subtractButton = document.getElementById(`${i}-`)
+    const step = document.getElementById(`s${i}`)
+    const cost = document.getElementById(`${i}cost`)
+    const time = document.getElementById(`${i}time`)
+
+    time.innerHTML = `${sim[`${i}`]["time"]} Days`
+    cost.innerHTML = `$${sim[`${i}`]["cost"]}`
+
+    if(sim[`${i}`]['is_active'] === false){
+      if(addButton !== null && subtractButton !== null){
+        addButton.disabled = true
+        subtractButton.disabled = true
+      }
+
+      step.style.backgroundColor = '#808080'
+    }
+  }
 }
 
 function drawCriticalPath(sim){
@@ -126,6 +153,7 @@ function drawCriticalPath(sim){
   lineID = `${sim["path"][0]}-44`
   line = document.getElementById(lineID)
   line.style.backgroundColor = "red"
+
 }
 //found this function online, modified slightly
 function adjustLine(from, to, line) {
@@ -200,12 +228,13 @@ function updateStep(step_num, sim){
   let cost = document.getElementById(`${step_num}cost`);
   let time = document.getElementById(`${step_num}time`);
 
+
   cost.innerHTML = `$${sim[`${step_num}`]["cost"]}`;
   time.innerHTML = `${sim[`${step_num}`]["time"]} Days`;
   
   tCost.innerHTML = `$${sim["cost"]}`
 
-  days.innerHTML = `Days:${sim["days"]}`;
+  remaining.innerHTML = `Time Remaining:${sim["days"]}`;
 
   updateButton(step_num, sim)
 
@@ -213,16 +242,13 @@ function updateStep(step_num, sim){
 }
 //updates the button to disabled or enabled
 function updateButton(step_num, sim){
-  let sbutton = document.getElementById(`${step_num}+`);
-  let abutton = document.getElementById(`${step_num}-`);
+  let sbutton = document.getElementById(`${step_num}-`);
+  let abutton = document.getElementById(`${step_num}+`);
   // less than or equal because this is called after being pressed therefore is 1 more than actual
   if (Number(sim[`${step_num}`]["reductions"]) < 1) {
     abutton.disabled = false;
     sbutton.disabled = true;
-  } else if (
-    Number(sim[`${step_num}`]["reductions"]) >=
-    Number(sim[`${step_num}`]["max_reductions"]) - 1
-  ) {
+  } else if (Number(sim[`${step_num}`]["reductions"]) > Number(sim[`${step_num}`]["max_reductions"]) - 1) {
     abutton.disabled = true;
     sbutton.disabled = false;
   } else {
@@ -242,5 +268,5 @@ function progress(){
       body: JSON.stringify({"next":true}),
     })
       .then((response) => response.json())
-      .then((response) => console.log(response));
+      .then((response) => render_progress(response))
 }

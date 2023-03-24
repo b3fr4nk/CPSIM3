@@ -1,0 +1,39 @@
+<body>
+    <form action="{{url_for('auth.signup')}}" method="POST">
+        {{form.csrf_token}}
+        <legend>Sign Up</legend>
+
+        
+        {{form.email.label}}
+
+        {{form.email}}
+
+        <ul>
+            {% for error in form.email.errors %}
+                <li class="error">{{error}}</li>
+            {% endfor %}
+        </ul>
+        
+
+        {{form.password.label}}
+        {{form.password}}
+
+        <ul>
+            {% for error in form.password.errors %}
+                <li class="error">{{error}}</li>
+            {% endfor %}
+        </ul>
+
+        {{form.class_code.label}}
+        {{form.class_code}}
+
+        <ul>
+            {% for error in form.class_code.errors %}
+                <li class="error">{{error}}</li>
+                {% endfor %}
+        </ul>
+
+        {{form.submit}}
+    </form>
+    
+</body>

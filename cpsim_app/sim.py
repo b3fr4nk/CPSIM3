@@ -1,5 +1,7 @@
 import time
-from step import Step
+from cpsim_app.step import Step
+from cpsim_app.event import Event
+import json
 
 class Sim():
     """
@@ -9,9 +11,11 @@ class Sim():
     def __init__(self, start_step, deadline, change_events):
         self.__start_step = start_step
         self.deadline = deadline
-        self.__change_events = change_events #TODO implement change events
+        self.current_day = 0
+        self.__change_events = change_events
+        self.time_left = deadline
 
-        self._time_remaining = deadline
+        self.running = True
         self._cpath = []
 
         self._steps = self.get_steps_dict(self.__start_step)
@@ -19,7 +23,7 @@ class Sim():
         output = self.calc(1)
         self._current_cost = output['cost']
         self._current_time = output['time']
-        self.__current_day = 0
+        
 
     def get_start(self):
         return self.__start_step
@@ -33,7 +37,7 @@ class Sim():
 
         return steps
 
-    def get_json(self, step1, step_num):
+    def get_json(self):
         results = {}
 
         steps = self._steps
@@ -41,6 +45,8 @@ class Sim():
         for step in steps.keys():
             step_json = steps[step].get_json()
             results[f'{step_json["step"]}'] = step_json
+
+        results['day'] = self.current_day
 
         return results
 
@@ -88,6 +94,9 @@ class Sim():
         curr_time = time + self._steps[f"{step_num}"].get_time()
         next_time = curr_time
         cPath = [step_num]
+
+        if curr_time < self.current_day:
+            self._steps[f"{step_num}"].is_active = False
         
         if len(self._steps[f"{step_num}"].get_next()) > 0:
             fast_time = curr_time + self._steps[f"{step_num}"].get_next()[0].get_time()
@@ -104,8 +113,6 @@ class Sim():
                 if temp_time < fast_time:
                     fast_time = temp_time
         
-            # self._steps[f"{step_num}"].set_slack(self._calc_slack(fast_time, next_time))
-        
         return [next_time, cPath]
         
 
@@ -116,19 +123,27 @@ class Sim():
         for item in list2:
             list1.append(item)
         return list1
+
+    def event(self):
+        for event in self.__change_events:
+            if event.day == self.current_day:
+                self._steps[f'{event.step_num}'].add_delay(event.delay)
+
     def next_day(self):
 
-        if self.__current_day < self._current_time:
+        time_left = self.deadline - self.current_day
+
+        if self.current_day < self._current_time:
             output = self.calc(1)
             self._current_cost = output['cost']
             self._current_time = output['time']
-            self._time_remaining = self._current_time - self.__current_day
             
-            self.__current_day += 1
+            self.event()
 
-            return {"running":True, "cost":self._current_cost, "time":self._time_remaining}
-
-        return {"running":False, "cost":self._current_cost, "time":self.__current_day}
+            self.current_day += 1
+        else:
+            self.running = False
+            self._current_cost += -5000 * time_left # adds the late cost of $5000 per day
 
 
 #testing stuff
