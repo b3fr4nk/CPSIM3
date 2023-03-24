@@ -49,3 +49,8 @@ class SignUpForm(FlaskForm):
         if user and not bcrypt.check_password_hash(
                 user.password, password.data):
             raise ValidationError('Password doesn\'t match. Please try again.')
+
+    def validate_email(self, email):
+        match = re.findall("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$", email.data)
+        if len(match) < 1:
+            raise ValidationError('Please enter a valid email address')
