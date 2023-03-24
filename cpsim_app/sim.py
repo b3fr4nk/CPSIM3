@@ -143,6 +143,7 @@ class Sim():
             self.current_day += 1
         else:
             self.running = False
+            self._current_cost += -5000 * time_left # adds the late cost of $5000 per day
 
 
 #testing stuff

@@ -24,6 +24,15 @@
             {% endfor %}
         </ul>
 
+        {{form.class_code.label}}
+        {{form.class_code}}
+
+        <ul>
+            {% for error in form.class_code.errors %}
+                <li class="error">{{error}}</li>
+                {% endfor %}
+        </ul>
+
         {{form.submit}}
     </form>
     

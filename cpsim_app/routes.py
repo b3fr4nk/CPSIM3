@@ -124,9 +124,36 @@ def progress():
             sim.next_day()
             if not sim.running:
                 save_sim()
-                #TODO add a submissions page and redirect to it
+                sim_doc = SimDoc.query.filter_by(user_id=current_user.id).first()
+                sim_doc.cost = sim.get_cost()
+                sim_doc.time = sim.get_time()
+
+                db.session.add(sim_doc)
+                db.session.commit()
                 
         return get_sim_data()
+
+@main.route('/grades', methods=['GET'])
+@login_required
+def show_results():
+    if current_user.is_teacher:
+        students = User.query.filter_by(is_teacher=False, class_code=current_user.class_code).all()
+        names = []
+        sims = []
+        for student in students:
+            sim = SimDoc.query.filter_by(user_id=student.id).first()
+            print(sim)
+            sims.append(sim)
+            names.append(student.school_email)
+        
+        context = {
+            'students':names,
+            'sim':sims
+        }
+
+        print(context)
+
+        return render_template('grades.html', **context)        
 
 @auth.route('/signup', methods=['POST', 'GET'])
 def signup():
@@ -135,11 +162,14 @@ def signup():
     if form.validate_on_submit():
         hashed_password = bcrypt.generate_password_hash(form.password.data)
         
-        user = User(school_email=form.email.data, password=hashed_password)
+        user = User(school_email=form.email.data, password=hashed_password, class_code=form.class_code.data, is_teacher=True) # TODO add better is teacher logic
         file_path = f'{os.path.join(app.config["SIM_FOLDER"])}{user.id}.pkl'
-        user_sim = SimDoc(doc=file_path)
+        
 
         db.session.add(user)
+        db.session.commit()
+
+        user_sim = SimDoc(doc=file_path, time=121, cost=3820220, user_id=user.id)
         db.session.add(user_sim)
         db.session.commit()
 

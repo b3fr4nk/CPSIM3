@@ -1,0 +1,17 @@
+<h1>{{current_user.class_code}}</h1>
+
+<ul class="student-names">
+    <h3>Student</h3>
+    {% for student in students %}
+        <li>{{student.school_email}}</li>
+    {% endfor %}
+</ul>
+
+<ul class="student-sims">
+    <h3>Sim</h3>
+    {% for sim in sims %}
+        <li class="sim-results">{{sim.cost}}</li>
+    {% endfor%}
+</ul>
+
+
