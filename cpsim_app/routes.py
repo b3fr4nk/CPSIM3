@@ -161,7 +161,7 @@ def signup():
     if form.validate_on_submit():
         hashed_password = bcrypt.generate_password_hash(form.password.data)
         
-        user = User(school_email=form.email.data, password=hashed_password, class_code=form.class_code.data, is_teacher=True) # TODO add better is teacher logic
+        user = User(school_email=form.email.data, password=hashed_password, class_code=form.class_code.data, is_teacher=False) # TODO add better is teacher logic
         file_path = f'{os.path.join(app.config["SIM_FOLDER"])}{user.id}.pkl'
         
 
