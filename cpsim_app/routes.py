@@ -182,17 +182,19 @@ def login():
     
     if form.validate_on_submit():
         user = User.query.filter_by(school_email=form.email.data).first()
-        login_user(user, remember=True)
+        if user:
 
-        global file_path
+            login_user(user, remember=True)
 
-        file_path = f'{os.path.join(app.config["SIM_FOLDER"])}{current_user.id}.json'
-        try:
-            load_sim()
-        except FileNotFoundError:
-            save_sim()
+            global file_path
 
-        return redirect(url_for('main.render_sim'))
+            file_path = f'{os.path.join(app.config["SIM_FOLDER"])}{current_user.id}.json'
+            try:
+                load_sim()
+            except FileNotFoundError:
+                save_sim()
+
+            return redirect(url_for('main.render_sim'))
 
     return render_template('login.html', form=form)
 
