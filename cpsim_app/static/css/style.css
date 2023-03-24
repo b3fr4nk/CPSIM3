@@ -3,6 +3,27 @@ body{
 	padding: 0;
 }
 
+.grade-container{
+	display: grid;
+	grid-template-columns: repeat(2, 50% [col-start]);
+	grid-template-rows: 1, 100%;
+}
+
+.student-names{
+	text-decoration: none;
+	list-style-type: none;
+}
+
+.student-sims{
+	text-decoration: none;
+	list-style-type: none;
+}
+
+.navlink{
+	text-decoration: none;
+	background-color: green;
+}
+
 #sim{
 	position: relative;
 	display: grid;
