@@ -152,7 +152,12 @@ def show_results():
 
         print(context)
 
-        return render_template('grades.html', **context)        
+        return render_template('grades.html', **context)      
+
+@main.route('/results', methods=['GET'])
+@login_required
+def show_single_results():
+    return render_template('finish.html', cost = sim.get_cost())
 
 @auth.route('/signup', methods=['POST', 'GET'])
 def signup():

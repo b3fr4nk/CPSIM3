@@ -135,6 +135,11 @@ function render_progress(sim){
       step.style.backgroundColor = '#808080'
     }
   }
+
+  if(sim["day"] == sim["days"]){
+    window.location.replace('/results')
+  }
+
 }
 
 function drawCriticalPath(sim){
