@@ -82,9 +82,9 @@ function render(sim){
     
     // add lines
     for(let i = 1; i < 44; i++){
-        from = document.getElementById(`s${sim[`${i}`]["step"]}`);
-        next = sim[`${i}`]["next"];
-        isRed = false
+        let from = document.getElementById(`s${sim[`${i}`]["step"]}`);
+        let next = sim[`${i}`]["next"];
+        let isRed = false
         
         for(let j = sim["path"].length-1; j >= 0; j--){
             if (Number(sim[`${i}`]["step"]) == Number(sim["path"][j])) {
@@ -92,7 +92,7 @@ function render(sim){
             }
         }
         for(let j=0; j < next.length; j++){
-            line = document.createElement("div")
+            let line = document.createElement("div")
             line.setAttribute("class", "line")
             line.setAttribute("id", `${sim[`${i}`]["step"]}-${next[j]["step"]}`)           
 
@@ -100,11 +100,11 @@ function render(sim){
             if(next[j]["step"] === 44){
               break
             }
-            to = document.getElementById(`s${next[j]["step"]}`)
+            let to = document.getElementById(`s${next[j]["step"]}`)
 
             adjustLine(from, to, line)
 
-            linePath = next[j]["step"]
+            let linePath = next[j]["step"]
         } 
     }
 
@@ -144,19 +144,19 @@ function render_progress(sim){
 
 function drawCriticalPath(sim){
   //change all lines to black
-  lines = document.getElementsByClassName("line") 
+  let lines = document.getElementsByClassName("line") 
   for(let i = 0; i < lines.length; i++){
     lines[i].style.backgroundColor = "black";
   }
   //change critical path to red
   for(let j = 1; j < sim["path"].length; j++){
-    lineID = `${sim["path"][j]}-${sim["path"][j - 1]}`;
-    line = document.getElementById(`${lineID}`)
+    let lineID = `${sim["path"][j]}-${sim["path"][j - 1]}`;
+    let line = document.getElementById(`${lineID}`)
     line.style.backgroundColor = "red"
   }
   //draw last line red
-  lineID = `${sim["path"][0]}-44`
-  line = document.getElementById(lineID)
+  let lineID = `${sim["path"][0]}-44`
+  let line = document.getElementById(lineID)
   line.style.backgroundColor = "red"
 
 }
