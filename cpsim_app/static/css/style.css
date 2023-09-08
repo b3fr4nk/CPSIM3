@@ -19,11 +19,6 @@ body{
 	list-style-type: none;
 }
 
-.navlink{
-	text-decoration: none;
-	background-color: green;
-}
-
 #sim{
 	position: relative;
 	display: grid;
