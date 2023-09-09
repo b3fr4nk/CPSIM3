@@ -6,7 +6,7 @@ instance/*
 !instance/.gitignore
 .webassets-cache
 .env
-cpsim_app/static/sims/
+
 cpsim_app/database.db
 
 ### Flask.Python Stack ###
