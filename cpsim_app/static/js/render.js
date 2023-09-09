@@ -31,13 +31,13 @@ function render(sim){
         addButton.innerHTML = "+";
         addButton.setAttribute("id", `${sim[`${i}`]["step"]}+`);
         addButton.setAttribute("class", `${sim[`${i}`]["step"]}`);
-        addButton.setAttribute("onClick", `add(this.getAttribute("class"))`)
+        addButton.addEventListener("click", function() { add(sim[`${i}`]["step"])})
         
         const subtractButton = document.createElement("button");
         subtractButton.innerHTML = "-";
         subtractButton.setAttribute("id", `${sim[`${i}`]["step"]}-`)
         subtractButton.setAttribute("class", `${sim[`${i}`]["step"]}`);
-        subtractButton.setAttribute("onClick", `reduce(this.getAttribute("class"))`)
+        subtractButton.addEventListener("click", function() { reduce(sim[`${i}`]["step"])})
 
         const editButtons = document.createElement("div");
         editButtons.appendChild(addButton);
@@ -211,7 +211,7 @@ function add(step){
 }
 // for when reduce button is pressed
 function reduce(step) {
-    
+    console.log(step)
     updateSim(step, true);
 }
 // updates whole sim 
@@ -247,19 +247,25 @@ function updateStep(step_num, sim){
 }
 //updates the button to disabled or enabled
 function updateButton(step_num, sim){
-  let sbutton = document.getElementById(`${step_num}-`);
-  let abutton = document.getElementById(`${step_num}+`);
-  // less than or equal because this is called after being pressed therefore is 1 more than actual
-  if (Number(sim[`${step_num}`]["reductions"]) < 1) {
-    abutton.disabled = false;
-    sbutton.disabled = true;
-  } else if (Number(sim[`${step_num}`]["reductions"]) > Number(sim[`${step_num}`]["max_reductions"]) - 1) {
-    abutton.disabled = true;
-    sbutton.disabled = false;
-  } else {
-    abutton.disabled = false;
-    sbutton.disabled = false;
+  try {
+    let sbutton = document.getElementById(`${step_num}-`);
+    let abutton = document.getElementById(`${step_num}+`);
+
+      // less than or equal because this is called after being pressed therefore is 1 more than actual
+    if (Number(sim[`${step_num}`]["reductions"]) < 1) {
+      abutton.disabled = false;
+      sbutton.disabled = true;
+    } else if (Number(sim[`${step_num}`]["reductions"]) > Number(sim[`${step_num}`]["max_reductions"]) - 1) {
+      abutton.disabled = true;
+      sbutton.disabled = false;
+    } else {
+      abutton.disabled = false;
+      sbutton.disabled = false;
+    }
+  } catch {
+    console.log(`no buttons for step ${step_num}`)
   }
+
 }
 
 function progress(){
