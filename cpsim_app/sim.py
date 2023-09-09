@@ -54,9 +54,9 @@ class Sim():
         step = self.__start_step
 
         if isAdd:
-            self._steps[step_num].add_cost()
+            self._steps[f'{step_num}'].add_cost()
         else:
-            self._steps[step_num].reduce_cost()
+            self._steps[f'{step_num}'].reduce_cost()
 
         self._steps = self.get_steps_dict(self.get_start())
 
