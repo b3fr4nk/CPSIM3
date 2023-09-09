@@ -7,6 +7,8 @@ sim = {}
 const remaining = document.getElementById("days");
 const tCost = document.getElementById("cost")
 const day = document.getElementById("day")
+const progressButton = document.getElementById('progress')
+progressButton.addEventListener('click', function() {progress()})
 
 
 fetch("/sim")
