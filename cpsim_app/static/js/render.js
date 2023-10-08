@@ -32,13 +32,13 @@ function render(sim){
         const addButton = document.createElement("button");
         addButton.innerHTML = "+";
         addButton.setAttribute("id", `${sim[`${i}`]["step"]}+`);
-        addButton.setAttribute("class", `${sim[`${i}`]["step"]}`);
+        addButton.setAttribute("class", `${sim[`${i}`]["step"]} button`);
         addButton.addEventListener("click", function() { add(sim[`${i}`]["step"])})
         
         const subtractButton = document.createElement("button");
         subtractButton.innerHTML = "-";
         subtractButton.setAttribute("id", `${sim[`${i}`]["step"]}-`)
-        subtractButton.setAttribute("class", `${sim[`${i}`]["step"]}`);
+        subtractButton.setAttribute("class", `${sim[`${i}`]["step"]} button`);
         subtractButton.addEventListener("click", function() { reduce(sim[`${i}`]["step"])})
 
         const editButtons = document.createElement("div");
