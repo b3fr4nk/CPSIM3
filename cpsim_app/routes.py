@@ -10,11 +10,22 @@ import json
 from cpsim_app.forms import LoginForm, SignUpForm
 import os
 import pickle
+from authlib.integrations.flask_client import OAuth
 
 from cpsim_app.extensions import db, app, bcrypt
 
 main = Blueprint("main", __name__)
 auth = Blueprint("auth", __name__)
+
+oauth = OAuth(app)
+oauth.init_app(app)
+
+oauth.register(
+    name = 'google',
+    client_id = os.getenv('GOOGLE_OAUTH_ID'),
+    client_secrets = os.getenv('GOOGLE_OAUTH_SECRET'),
+    authorize_url ='https://accounts.google.com/o/oauth2/v2/auth?scope=https%3A//www.googleapis.com/auth/drive.metadata.readonly'
+)
 
 #Sim
 end = Step(44, [], 0, 0, [])
@@ -180,6 +191,23 @@ def signup():
         return redirect(url_for('auth.login'))
 
     return render_template('signup.html', form=form)
+
+@auth.route('/login/google', methods=['GET'])
+def google_login():
+    redirect_uri = url_for('authorize', _external=True)
+    return oauth.google.authorize_redirect(redirect_uri)
+
+@app.route('/authorize/google')
+def authorize():
+    print('authorizing')
+    token = oauth.twitter.authorize_access_token()
+    resp = oauth.twitter.get('account/verify_credentials.json')
+    resp.raise_for_status()
+    profile = resp.json()
+    # do something with the token and profile
+    print(profile)
+    return redirect('/')
+
 
 @auth.route('/login', methods=['POST', 'GET'])
 def login():
