@@ -1,7 +1,7 @@
 from cpsim_app.sim import Sim
 from cpsim_app.step import Step
 from cpsim_app.event import Event
-from flask import Blueprint, request, render_template, redirect, url_for, flash
+from flask import Blueprint, request, render_template, redirect, url_for, flash, session
 from datetime import date, datetime
 from cpsim_app.models import User, SimDoc
 from flask_login import login_user, logout_user, login_required, current_user
@@ -16,16 +16,6 @@ from cpsim_app.extensions import db, app, bcrypt
 
 main = Blueprint("main", __name__)
 auth = Blueprint("auth", __name__)
-
-oauth = OAuth(app)
-oauth.init_app(app)
-
-oauth.register(
-    name = 'google',
-    client_id = os.getenv('GOOGLE_OAUTH_ID'),
-    client_secrets = os.getenv('GOOGLE_OAUTH_SECRET'),
-    authorize_url ='https://accounts.google.com/o/oauth2/v2/auth?scope=https%3A//www.googleapis.com/auth/drive.metadata.readonly'
-)
 
 #Sim
 end = Step(44, [], 0, 0, [])
@@ -78,6 +68,26 @@ sim = Sim(step1, 107, random_events)
 start_step = sim.get_start()
 steps = sim.get_json()
 
+# OAuth stuff
+
+oauth = OAuth(app)
+CONF_URL = 'https://accounts.google.com/.well-known/openid-configuration'
+
+oauth.register(
+    name = 'google',
+    client_id = os.getenv('GOOGLE_OAUTH_ID'),
+    server_metadata_url=CONF_URL,
+    client_secret = os.getenv('GOOGLE_OAUTH_SECRET'),
+    access_token_url = ' https://oauth2.googleapis.com/token',
+    authorize_url ='https://accounts.google.com/o/oauth2/v2/auth',
+    client_kwargs = {
+        'scope': 'openid email profile'
+    }
+)
+
+google = oauth.google
+
+# Helper functions
 
 def save_sim():
     file_path = f'{os.path.join(app.config["SIM_FOLDER"])}{current_user.id}.pkl'
@@ -89,6 +99,33 @@ def load_sim():
     with open(file_path, 'rb') as inp:
         global sim
         sim = pickle.load(inp)
+
+def create_user(school_email, password, class_code, is_teacher):
+    hashed_password = bcrypt.generate_password_hash(password)
+        
+    user = User(school_email=school_email, password=hashed_password, class_code=class_code, is_teacher=is_teacher) # TODO add better is teacher logic
+    file_path = f'{os.path.join(app.config["SIM_FOLDER"])}{user.id}.pkl'
+    
+
+    db.session.add(user)
+    db.session.commit()
+
+    user_sim = SimDoc(doc=file_path, time=121, cost=3820220, user_id=user.id)
+    db.session.add(user_sim)
+    db.session.commit()
+
+def user_login(user):
+    login_user(user, remember=True)
+
+    global file_path
+
+    file_path = f'{os.path.join(app.config["SIM_FOLDER"])}{current_user.id}.json'
+    try:
+        load_sim()
+    except FileNotFoundError:
+        save_sim()
+
+    
 
 #Routes
 @main.route("/")
@@ -194,20 +231,29 @@ def signup():
 
 @auth.route('/login/google', methods=['GET'])
 def google_login():
-    redirect_uri = url_for('authorize', _external=True)
-    return oauth.google.authorize_redirect(redirect_uri)
+    redirect_uri = url_for('auth.authorize', _external=True)
+    return google.authorize_redirect(redirect_uri)
 
-@app.route('/authorize/google')
+@auth.route('/authorize')
 def authorize():
-    print('authorizing')
-    token = oauth.twitter.authorize_access_token()
-    resp = oauth.twitter.get('account/verify_credentials.json')
-    resp.raise_for_status()
-    profile = resp.json()
-    # do something with the token and profile
-    print(profile)
+    # print(google.client_auth_methods)
+    token = oauth.google.authorize_access_token()
+    user_info = token['userinfo']
+    
+    user = User.query.filter_by(school_email=token['userinfo']['email']).first()
+    if user:
+        user_login(user)
+        return redirect(url_for('main.render_sim'))
+    else:
+        is_teacher = False
+        if user_info['email'] == 'william.wood@students.dominican.edu':
+            is_teacher = True
+        create_user(user_info['email'], token['id_token'], 'google', is_teacher)
+        user = User.query.filter_by(school_email=token['userinfo']['email']).first()
+        user_login(user)
+        return redirect(url_for('main.render_sim'))
+        
     return redirect('/')
-
 
 @auth.route('/login', methods=['POST', 'GET'])
 def login():
