@@ -10,7 +10,6 @@ const day = document.getElementById("day")
 const progressButton = document.getElementById('progress')
 progressButton.addEventListener('click', function() {progress()})
 
-
 fetch("/sim")
     .then((response) => response.json())
     .then((data) => render(data));
@@ -138,8 +137,29 @@ function render_progress(sim){
     }
   }
 
-  if(sim["day"] == sim["days"]){
+  if(sim["day"] === sim["days"]){
     window.location.replace('/results')
+  }
+
+  // display a popup on delay since delays are hard coded and not transmitted to frontend
+  if(sim["day"] === 24){
+    const myModal = new bootstrap.Modal(document.getElementById('myModal'));
+    myModal.show()
+  }
+
+  if(sim["day"] === 31){
+    const myModal = new bootstrap.Modal(document.getElementById('myModal'));
+    myModal.show()
+  }
+
+  if(sim["day"] === 24){
+    const myModal = new bootstrap.Modal(document.getElementById('myModal'));
+    myModal.show()
+  }
+
+  if(sim["day"] === 74){
+    const myModal = new bootstrap.Modal(document.getElementById('myModal'));
+    myModal.show()
   }
 
 }
@@ -281,5 +301,5 @@ function progress(){
       body: JSON.stringify({"next":true}),
     })
       .then((response) => response.json())
-      .then((response) => render_progress(response))
+      .then((response) => {render_progress(response)})
 }
