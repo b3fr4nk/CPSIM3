@@ -10,6 +10,7 @@ import json
 from cpsim_app.forms import LoginForm, SignUpForm
 import os
 import pickle
+import html
 from authlib.integrations.flask_client import OAuth
 
 from cpsim_app.extensions import db, app, bcrypt
@@ -212,9 +213,9 @@ def signup():
     form = SignUpForm()
 
     if form.validate_on_submit():
-        hashed_password = bcrypt.generate_password_hash(form.password.data)
+        hashed_password = bcrypt.generate_password_hash(html.escape(form.password.data))
         
-        user = User(school_email=form.email.data, password=hashed_password, class_code=form.class_code.data, is_teacher=False) # TODO add better is teacher logic
+        user = User(school_email=html.escape(html.escape(form.email.data)), password=hashed_password, class_code=html.escape(form.class_code.data), is_teacher=False) # TODO add better is teacher logic
         file_path = f'{os.path.join(app.config["SIM_FOLDER"])}{user.id}.pkl'
         
 
@@ -260,7 +261,7 @@ def login():
     form = LoginForm()
     
     if form.validate_on_submit():
-        user = User.query.filter_by(school_email=form.email.data).first()
+        user = User.query.filter_by(school_email=html.escape(form.email.data)).first()
         if user:
 
             login_user(user, remember=True)
